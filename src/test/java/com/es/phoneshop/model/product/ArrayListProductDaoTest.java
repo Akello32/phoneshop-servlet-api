@@ -7,9 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -60,11 +58,6 @@ public class ArrayListProductDaoTest {
         productDao.save(productUpd);
 
         assertEquals("test-codeUpdate", productDao.getProduct(product.getId()).getCode());
-
-        productUpd.setId(100L);
-        productDao.save(productUpd);
-
-        assertNotNull(productDao.getProduct(productUpd.getId()));
     }
 
     @Test (expected = IllegalArgumentException.class)
