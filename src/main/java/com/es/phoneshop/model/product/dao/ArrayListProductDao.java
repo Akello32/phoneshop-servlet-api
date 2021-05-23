@@ -29,7 +29,7 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public ArrayList<Product> findProducts() {
+    public List<Product> findProducts() {
         return new ArrayList<>(products);
     }
 
