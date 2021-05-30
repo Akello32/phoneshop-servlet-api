@@ -5,14 +5,48 @@
          version="3.1">
   <display-name>Phoneshop servlet api training</display-name>
 
+  <context-param>
+    <param-name>insertDemoData</param-name>
+    <param-value>true</param-value>
+  </context-param>
+
   <servlet>
     <servlet-name>productList</servlet-name>
     <servlet-class>com.es.phoneshop.web.ProductListPageServlet</servlet-class>
   </servlet>
+
+  <filter>
+    <filter-name>commandFilter</filter-name>
+    <filter-class>com.es.phoneshop.web.command.CommandByUriFilter</filter-class>
+  </filter>
   
+  <listener>
+    <listener-class>com.es.phoneshop.web.DemoDataServletContextListener</listener-class>
+  </listener>
+
   <servlet-mapping>
     <servlet-name>productList</servlet-name>
-    <url-pattern>/products</url-pattern>
+    <url-pattern>*.html</url-pattern>
   </servlet-mapping>
 
+  <filter-mapping>
+    <filter-name>commandFilter</filter-name>
+    <url-pattern>*.html</url-pattern>
+  </filter-mapping>
+
+  <servlet>
+    <servlet-name>productPage</servlet-name>
+    <servlet-class>com.es.phoneshop.web.ProductDetailsPageServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>productPage</servlet-name>
+    <url-pattern>/products/*</url-pattern>
+  </servlet-mapping>
+
+  <error-page>
+    <location>/WEB-INF/pages/errorProductNotFound.jsp</location>
+    <error-code>500</error-code>
+<!--    <exception-type>com.es.phoneshop.model.product.exception.ProductNotFoundException</exception-type>-->
+  </error-page>
 </web-app>
