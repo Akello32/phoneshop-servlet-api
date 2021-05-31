@@ -26,12 +26,12 @@
 
   <servlet-mapping>
     <servlet-name>productList</servlet-name>
-    <url-pattern>*.html</url-pattern>
+    <url-pattern>/productList/*</url-pattern>
   </servlet-mapping>
 
   <filter-mapping>
     <filter-name>commandFilter</filter-name>
-    <url-pattern>*.html</url-pattern>
+    <url-pattern>*.jsp</url-pattern>
   </filter-mapping>
 
   <servlet>
@@ -46,7 +46,6 @@
 
   <error-page>
     <location>/WEB-INF/pages/errorProductNotFound.jsp</location>
-    <error-code>500</error-code>
-<!--    <exception-type>com.es.phoneshop.model.product.exception.ProductNotFoundException</exception-type>-->
+    <exception-type>com.es.phoneshop.model.product.exception.ProductNotFoundException</exception-type>
   </error-page>
 </web-app>

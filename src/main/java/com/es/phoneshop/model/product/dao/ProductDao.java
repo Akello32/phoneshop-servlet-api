@@ -11,7 +11,7 @@ public interface ProductDao {
 
     List<Product> findProducts();
 
-    List<Product> sortedProducts(String param);
+    List<Product> sortedProducts(String param, String order);
 
     List<Product> findProductsByQuery(String query);
 

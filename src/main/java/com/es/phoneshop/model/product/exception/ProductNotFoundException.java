@@ -7,6 +7,11 @@ public class ProductNotFoundException extends RuntimeException {
         this.productId = productId;
     }
 
+    public ProductNotFoundException(String message) {
+        super(message);
+        this.productId = -1L;
+    }
+
     public Long getProductCode() {
         return productId;
     }

@@ -3,7 +3,7 @@ package com.es.phoneshop.model.product.dao;
 public final class DaoFactory {
     private static final DaoFactory INSTANCE = new DaoFactory();
 
-    private final ArrayListProductDao productDaoImpl = new ArrayListProductDao();
+    private final ProductDao productDaoImpl = new ArrayListProductDao();
 
     private DaoFactory() {}
 
@@ -11,7 +11,7 @@ public final class DaoFactory {
         return INSTANCE;
     }
 
-    public ArrayListProductDao getProductDaoImpl() {
+    public ProductDao getProductDaoImpl() {
         return productDaoImpl;
     }
 }

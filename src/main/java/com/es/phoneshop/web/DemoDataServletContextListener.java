@@ -1,8 +1,8 @@
 package com.es.phoneshop.web;
 
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.dao.ArrayListProductDao;
 import com.es.phoneshop.model.product.dao.DaoFactory;
+import com.es.phoneshop.model.product.dao.ProductDao;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 public class DemoDataServletContextListener implements ServletContextListener {
-    private ArrayListProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
+    private ProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {

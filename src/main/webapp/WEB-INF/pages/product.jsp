@@ -5,7 +5,6 @@
 
 <tags:master pageTitle="product">
     <p>Welcome to the PDP!</p>
-    <c:url var="sortProductsUrl" value="/sortProducts.html"></c:url>
     <table>
         <thead>
         <tr>
@@ -18,6 +17,7 @@
         </thead>
         <tr>
             <td>
+
                 <img class="product-tile"
                      src="${product.imageUrl}">
             </td>

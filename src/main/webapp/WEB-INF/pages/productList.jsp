@@ -8,13 +8,13 @@
     <p>
         Welcome to Expert-Soft training!
     </p>
-    <c:url var="findQueryUrl" value="/findQuery.html"></c:url>
+    <c:url var="findQueryUrl" value="/productList/findQuery.jsp"></c:url>
     <form method="post" action="${findQueryUrl}">
         <input name="query" value="${param.query }"/>
         <button>Search</button>
     </form>
 
-    <c:url var="sortProductsUrl" value="/sortProducts.html"></c:url>
+    <c:url var="sortProductsUrl" value="/productList/sortProducts.jsp"></c:url>
     <table>
         <thead>
         <tr>
@@ -27,7 +27,7 @@
             <td class="price">Price
                 <tags:sortLink sortParam="price" sortLink="${sortProductsUrl}" order="ascend"
                                symbolOrder="&uArr;"></tags:sortLink>
-                <tags:sortLink sortParam="prices" sortLink="${sortProductsUrl}" order="descend"
+                <tags:sortLink sortParam="price" sortLink="${sortProductsUrl}" order="descend"
                                symbolOrder="&dArr;"></tags:sortLink></td>
         </tr>
         </thead>

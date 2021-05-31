@@ -1,6 +1,6 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.product.dao.ArrayListProductDao;
+import com.es.phoneshop.model.product.dao.ProductDao;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class ProductDetailsPageServletTest {
     @Mock
     private HttpServletResponse response;
     @Mock
-    private ArrayListProductDao productDao;
+    private ProductDao productDao;
 
     ProductDetailsPageServlet servlet = new ProductDetailsPageServlet();
     Currency usd = Currency.getInstance("USD");

@@ -1,6 +1,6 @@
 package com.es.phoneshop.model.product;
 
-import com.es.phoneshop.model.product.dao.ArrayListProductDao;
+import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 import org.junit.Before;
@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Currency;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +20,7 @@ public class ArrayListProductDaoTest {
 
     @Before
     public void setup() {
-        productDao = new ArrayListProductDao();
+        productDao = DaoFactory.getInstance().getProductDaoImpl();
     }
 
     @Before
@@ -51,45 +50,26 @@ public class ArrayListProductDaoTest {
     public void testFindProductsByQuery() {
         String query = "Samsung";
         List<Product> result = productDao.findProductsByQuery(query);
-        assertEquals(result.size(), result.stream()
-                .filter(p -> p.getDescription()
-                        .contains(query)).count());
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testSortProductByDesc() {
-        Comparator<Product> comparatorDesc = Comparator.comparing(Product::getDescription);
-        List<Product> products = productDao.sortedProducts("desc");
-        Iterator<Product> iter = products.iterator();
-        Product current, previous = iter.next();
-        boolean result = true;
-        while (iter.hasNext()) {
-            current = iter.next();
-            if (comparatorDesc.compare(previous, current) > 0) {
-                result =false;
-            }
-            previous = current;
-        }
-        assertTrue(result);
+        List<Product> products = productDao.sortedProducts("desc", "ascend");
+        List<Product> expected = productDao.findProducts();
+        expected.sort(Comparator.comparing(Product::getDescription));
+
+        assertEquals(expected, products);
     }
 
     @Test
     public void testSortProductByPrice() {
-        Comparator<Product> comparatorPrice = Comparator.comparing(Product::getPrice);
-        List<Product> products = productDao.sortedProducts("price");
-        Iterator<Product> iter = products.iterator();
-        Product current, previous = iter.next();
-        boolean result = true;
-        while (iter.hasNext()) {
-            current = iter.next();
-            if (comparatorPrice.compare(previous, current) > 0) {
-                result =false;
-            }
-            previous = current;
-        }
-        assertTrue(result);
-    }
+        List<Product> products = productDao.sortedProducts("price", "descend");
+        List<Product> expected = productDao.findProducts();
+        expected.sort(Comparator.comparing(Product::getPrice, Comparator.reverseOrder()));
 
+        assertEquals(expected, products);
+    }
 
     @Test
     public void testGetProduct() throws ProductNotFoundException {
@@ -98,7 +78,7 @@ public class ArrayListProductDaoTest {
 
     @Test(expected = ProductNotFoundException.class)
     public void testGetProductException() throws ProductNotFoundException {
-        productDao.getProduct(null).orElseThrow(() -> new ProductNotFoundException(null));
+        productDao.getProduct(null).orElseThrow(() -> new ProductNotFoundException((Long) null));
     }
 
     @Test

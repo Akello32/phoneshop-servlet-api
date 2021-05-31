@@ -16,10 +16,9 @@ public class CommandByUriFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        commands.put("/", new MainCommand());
-        commands.put("/products", new MainCommand());
-        commands.put("/findQuery", new FindProductByQueryCommand());
-        commands.put("/sortProducts", new SortProductsByParamCommand());
+        commands.put("/productList/products", new MainCommand());
+        commands.put("/productList/findQuery", new FindProductByQueryCommand());
+        commands.put("/productList/sortProducts", new SortProductsByParamCommand());
     }
 
     @Override
