@@ -7,7 +7,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class FindProductByQueryCommand implements Command {
-    private final ProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
+    private final ProductDao productDao;
+
+    public FindProductByQueryCommand() {
+        this.productDao  = DaoFactory.getInstance().getProductDaoImpl();
+    }
+
+    /**Constructor for tests*/
+    public FindProductByQueryCommand(ProductDao productDao) {
+        this.productDao = productDao;
+    }
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {

@@ -7,7 +7,9 @@
 <tags:master pageTitle="Product List">
     <p>
         Welcome to Expert-Soft training!
+        ${pageContext.request.requestURI}
     </p>
+    <p> ${pageContext.request.contextPath}</p>
     <c:url var="findQueryUrl" value="/productList/findQuery.jsp"></c:url>
     <form method="post" action="${findQueryUrl}">
         <input name="query" value="${param.query }"/>

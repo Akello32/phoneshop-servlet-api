@@ -14,6 +14,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CommandByUriFilter implements Filter {
     private Map<String, Command> commands = new ConcurrentHashMap<>();
 
+    public CommandByUriFilter() {
+    }
+
+    /**Constructor for tests*/
+    public CommandByUriFilter(Map<String, Command> commands) {
+        this.commands = commands;
+    }
+
     @Override
     public void init(FilterConfig filterConfig) {
         commands.put("/productList/products", new MainCommand());
