@@ -15,11 +15,23 @@ public class SortProductsByParamCommand implements Command {
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         String sortOrder = request.getParameter("order");
         String sortParam = request.getParameter("sortParam");
+        boolean foundOnRequest = Boolean.parseBoolean(request.getParameter("foundOnRequest"));
 
-        List<Product> result = productDao.sortedProducts(sortParam, sortOrder);
+        List<Product> result;
+
+        if (foundOnRequest) {
+            String query = request.getParameter("query");
+            result = productDao.findProductsByQuery(query);
+            result = productDao.sortedProducts(result, sortParam, sortOrder);
+            request.setAttribute("foundOnRequest", true);
+            request.setAttribute("query", query);
+        } else {
+            result = productDao.sortedProducts(null, sortParam, sortOrder);
+        }
 
         request.setAttribute("products", result);
-
+        request.setAttribute("sortOrder", sortOrder);
+        request.setAttribute("sortParam", sortParam);
         return "/WEB-INF/pages/productList.jsp";
     }
 }

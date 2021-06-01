@@ -14,12 +14,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.reverseOrder;
+
 class ArrayListProductDao implements ProductDao {
     private Long maxId = 0L;
     private final List<Product> products = new ArrayList<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    ArrayListProductDao() {}
+    ArrayListProductDao() {
+    }
 
     @Override
     public Optional<Product> getProduct(Long id) {
@@ -36,16 +39,15 @@ class ArrayListProductDao implements ProductDao {
     @Override
     public List<Product> findProductsByQuery(String query) {
         String[] queries = query.toLowerCase().trim().split("\\s+");
-        Function<Product, Long> function = p -> Arrays.stream(queries)
+        Function<Product, Long> countMatches = p -> Arrays.stream(queries)
                 .filter(q -> p.getDescription().toLowerCase().contains(q.trim()))
                 .count();
-        Comparator<Product> comparator = Comparator.comparing(function, Comparator.reverseOrder());
+        Comparator<Product> comparator = Comparator.comparing(countMatches, reverseOrder());
 
         return filterProductsByStockPrice(products.stream()
                 .filter(p -> {
                     int counter = (int) Arrays.stream(queries)
-                            .filter(q -> p.getDescription().
-                                    toLowerCase().contains(q.trim()))
+                            .filter(q -> p.getDescription().toLowerCase().contains(q.trim()))
                             .count();
                     return counter != 0;
                 })
@@ -62,20 +64,31 @@ class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public List<Product> sortedProducts(String param, String order) {
-        Map<String, Function<Product, Object>> sortingFunctions = new HashMap<>();
-        sortingFunctions.put("desc", Product::getDescription);
-        sortingFunctions.put("price", Product::getPrice);
+    public List<Product> sortedProducts(List<Product> productList, String param, String order) {
+        Map<String, Comparator<Product>> sortingFunctions = new HashMap<>();
+        sortingFunctions.put("default", Comparator.comparing(Product::getId));
+        sortingFunctions.put("desc", Comparator.comparing(Product::getDescription));
+        sortingFunctions.put("price", Comparator.comparing(Product::getPrice));
 
-        Function function = sortingFunctions.get(param);
-        Comparator<Product> comparator = Comparator.comparing(function);
-        if (order.equals("descend")) {
-            comparator = Comparator.comparing(function, Comparator.reverseOrder());
+        Comparator<Product> comparator;
+        if (sortingFunctions.containsKey(param)) {
+            comparator = sortingFunctions.get(param);
+            if ("descend".equals(order)) {
+                comparator = sortingFunctions.get(param).reversed();
+            }
+        } else {
+            comparator = sortingFunctions.get("default");
         }
 
-        return filterProductsByStockPrice(products.stream()
-                                                  .sorted(comparator)
-                                                  .collect(Collectors.toList()));
+        if (productList == null) {
+            List<Product> result = products.stream().sorted(comparator)
+                    .collect(Collectors.toList());
+
+            return filterProductsByStockPrice(result);
+        } else {
+            productList.sort(comparator);
+            return filterProductsByStockPrice(productList);
+        }
     }
 
     @Override

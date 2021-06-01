@@ -15,6 +15,9 @@ public class FindProductByQueryCommand implements Command {
 
         request.setAttribute("products", productDao.findProductsByQuery(query));
 
+        request.setAttribute("foundOnRequest", true);
+        request.setAttribute("query", query);
+
         return "/WEB-INF/pages/productList.jsp";
     }
 }

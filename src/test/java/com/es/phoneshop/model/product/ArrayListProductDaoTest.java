@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 public class ArrayListProductDaoTest {
     private ProductDao productDao;
 
-
     @Before
     public void setup() {
         productDao = DaoFactory.getInstance().getProductDaoImpl();
@@ -49,14 +48,17 @@ public class ArrayListProductDaoTest {
     @Test
     public void testFindProductsByQuery() {
         String query = "Samsung";
+
         List<Product> result = productDao.findProductsByQuery(query);
+
         assertEquals(2, result.size());
     }
 
     @Test
     public void testSortProductByDesc() {
-        List<Product> products = productDao.sortedProducts("desc", "ascend");
+        List<Product> products = productDao.sortedProducts(null, "desc", "ascend");
         List<Product> expected = productDao.findProducts();
+
         expected.sort(Comparator.comparing(Product::getDescription));
 
         assertEquals(expected, products);
@@ -64,11 +66,24 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testSortProductByPrice() {
-        List<Product> products = productDao.sortedProducts("price", "descend");
+        List<Product> products = productDao.sortedProducts(null, "price", "descend");
         List<Product> expected = productDao.findProducts();
+
         expected.sort(Comparator.comparing(Product::getPrice, Comparator.reverseOrder()));
 
         assertEquals(expected, products);
+    }
+
+
+    @Test
+    public void testSortWithGivenProducts() {
+        List<Product> products = productDao.findProducts().subList(1, 5);
+        List<Product> expected = products;
+
+        List<Product> result = productDao.sortedProducts(products, "price", "descend");
+        expected.sort(Comparator.comparing(Product::getPrice, Comparator.reverseOrder()));
+
+        assertEquals(expected, result);
     }
 
     @Test
@@ -87,9 +102,13 @@ public class ArrayListProductDaoTest {
         Product product = new Product(null, "test-code", "test-description", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
 
         productDao.save(product);
+
         assertTrue(product.getId() > 0);
+
         Optional<Product> expected = productDao.getProduct(product.getId());
+
         assertNotNull(expected);
+
         assertEquals("test-code", expected.get().getCode());
     }
 
@@ -99,6 +118,7 @@ public class ArrayListProductDaoTest {
         Product product = new Product(null, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
 
         productDao.save(product);
+
         Product productUpd = new Product(null, "test-codeUpdate", "test-description", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productUpd.setId(product.getId());
 
@@ -111,6 +131,7 @@ public class ArrayListProductDaoTest {
     public void testUpdateProductWithNegativeId() {
         Currency usd = Currency.getInstance("USD");
         Product product = new Product(-1L, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
+
         productDao.save(product);
     }
 
@@ -119,6 +140,7 @@ public class ArrayListProductDaoTest {
         productDao.getProduct(1L);
 
         productDao.delete(1L);
+
         productDao.getProduct(1L).orElseThrow(() -> new ProductNotFoundException(1L));
     }
 }

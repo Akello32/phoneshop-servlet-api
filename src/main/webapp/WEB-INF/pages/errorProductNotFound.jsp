@@ -4,7 +4,6 @@
 <%@ page isErrorPage = "true" %>
 
 <tags:master pageTitle="Product not found">
-    <h1>Product not Found :<</h1>
-    <h3>${pageContext.exception.message}</h3>
+    <h1>${pageContext.exception.message} :<</h1>
     <p>@Matvei</p>
 </tags:master>

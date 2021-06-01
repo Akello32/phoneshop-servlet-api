@@ -19,7 +19,7 @@
             <td>
 
                 <img class="product-tile"
-                     src="${product.imageUrl}">
+                     src="${product.imageUrl}" alt="productImg">
             </td>
             <td>${product.description}</td>
             <td>${product.code}</td>
