@@ -2,6 +2,7 @@ package com.es.phoneshop.web.command;
 
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
+import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,16 +14,17 @@ public class FindProductByQueryCommand implements Command {
         this.productDao  = DaoFactory.getInstance().getProductDaoImpl();
     }
 
-    /**Constructor for tests*/
-    public FindProductByQueryCommand(ProductDao productDao) {
-        this.productDao = productDao;
+    FindProductByQueryCommand(DaoFactory daoFactory) {
+        this.productDao = daoFactory.getProductDaoImpl();
     }
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         String query = request.getParameter("query");
 
-        request.setAttribute("products", productDao.findProductsByQuery(query));
+        SearchParams params = new SearchParams(query);
+        request.setAttribute("products", productDao.findProducts(params
+        ));
 
         request.setAttribute("foundOnRequest", true);
         request.setAttribute("query", query);

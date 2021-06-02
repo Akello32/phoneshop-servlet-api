@@ -1,6 +1,7 @@
 package com.es.phoneshop.model.product.dao;
 
 import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +11,7 @@ public interface ProductDao {
 
     List<Product> findProducts();
 
-    List<Product> sortedProducts(List<Product> list, String param, String order);
-
-    List<Product> findProductsByQuery(String query);
+    List<Product> findProducts(SearchParams params);
 
     void save(Product product);
 

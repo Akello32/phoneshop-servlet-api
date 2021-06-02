@@ -2,6 +2,9 @@ package com.es.phoneshop.model.product;
 
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
+import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchParam.SortOrder;
+import com.es.phoneshop.model.product.dao.searchParam.SortParam;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,15 +51,17 @@ public class ArrayListProductDaoTest {
     @Test
     public void testFindProductsByQuery() {
         String query = "Samsung";
+        SearchParams params = new SearchParams(query);
 
-        List<Product> result = productDao.findProductsByQuery(query);
+        List<Product> result = productDao.findProducts(params);
 
         assertEquals(2, result.size());
     }
 
     @Test
     public void testSortProductByDesc() {
-        List<Product> products = productDao.sortedProducts(null, "desc", "ascend");
+        SearchParams params = new SearchParams(SortOrder.ASCEND, SortParam.DESC);
+        List<Product> products = productDao.findProducts(params);
         List<Product> expected = productDao.findProducts();
 
         expected.sort(Comparator.comparing(Product::getDescription));
@@ -66,24 +71,13 @@ public class ArrayListProductDaoTest {
 
     @Test
     public void testSortProductByPrice() {
-        List<Product> products = productDao.sortedProducts(null, "price", "descend");
+        SearchParams params = new SearchParams(SortOrder.DESCEND, SortParam.PRICE);
+        List<Product> products = productDao.findProducts(params);
         List<Product> expected = productDao.findProducts();
 
         expected.sort(Comparator.comparing(Product::getPrice, Comparator.reverseOrder()));
 
         assertEquals(expected, products);
-    }
-
-
-    @Test
-    public void testSortWithGivenProducts() {
-        List<Product> products = productDao.findProducts().subList(1, 5);
-        List<Product> expected = products;
-
-        List<Product> result = productDao.sortedProducts(products, "price", "descend");
-        expected.sort(Comparator.comparing(Product::getPrice, Comparator.reverseOrder()));
-
-        assertEquals(expected, result);
     }
 
     @Test

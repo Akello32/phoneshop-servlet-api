@@ -7,7 +7,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class MainCommand implements Command {
-    private final ProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
+    private final ProductDao productDao;
+
+    public MainCommand() {
+        productDao = DaoFactory.getInstance().getProductDaoImpl();
+    }
+
+    MainCommand(DaoFactory daoFactory) {
+        productDao = daoFactory.getProductDaoImpl();
+    }
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {

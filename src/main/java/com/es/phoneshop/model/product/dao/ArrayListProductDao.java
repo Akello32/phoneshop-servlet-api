@@ -1,11 +1,13 @@
 package com.es.phoneshop.model.product.dao;
 
 import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchParam.SortOrder;
+import com.es.phoneshop.model.product.dao.searchParam.SortParam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,8 +22,10 @@ class ArrayListProductDao implements ProductDao {
     private Long maxId = 0L;
     private final List<Product> products = new ArrayList<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Map<SortParam, Comparator<Product>> sortingFunctions;
 
-    ArrayListProductDao() {
+    ArrayListProductDao(Map<SortParam, Comparator<Product>> sortingFunctions) {
+        this.sortingFunctions = sortingFunctions;
     }
 
     @Override
@@ -37,12 +41,35 @@ class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public List<Product> findProductsByQuery(String query) {
+    public List<Product> findProducts(SearchParams params) {
+        String query = params.getQuery();
+        SortParam param = params.getParam();
+        SortOrder order = params.getOrder();
+        if (query == null && param == null) {
+            return filterProductsByStockPrice(products);
+        } else if (query != null && !query.trim().isEmpty() && param == null) {
+            return filterProductsByQuery(query, null, null);
+        } else if (param != null && query == null) {
+            return sortedProducts(param, order);
+        } else {
+            return filterProductsByQuery(query, param, order);
+        }
+    }
+
+    private List<Product> filterProductsByQuery(String query, SortParam param, SortOrder order) {
+        Comparator<Product> comparator;
         String[] queries = query.toLowerCase().trim().split("\\s+");
-        Function<Product, Long> countMatches = p -> Arrays.stream(queries)
-                .filter(q -> p.getDescription().toLowerCase().contains(q.trim()))
-                .count();
-        Comparator<Product> comparator = Comparator.comparing(countMatches, reverseOrder());
+        if (param == null || !sortingFunctions.containsKey(param)) {
+            Function<Product, Long> countMatches = p -> Arrays.stream(queries)
+                    .filter(q -> p.getDescription().toLowerCase().contains(q.trim()))
+                    .count();
+            comparator = Comparator.comparing(countMatches, reverseOrder());
+        } else {
+            comparator = sortingFunctions.get(param);
+            if (SortOrder.DESCEND == order) {
+                comparator = comparator.reversed();
+            }
+        }
 
         return filterProductsByStockPrice(products.stream()
                 .filter(p -> {
@@ -63,32 +90,17 @@ class ArrayListProductDao implements ProductDao {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<Product> sortedProducts(List<Product> productList, String param, String order) {
-        Map<String, Comparator<Product>> sortingFunctions = new HashMap<>();
-        sortingFunctions.put("default", Comparator.comparing(Product::getId));
-        sortingFunctions.put("desc", Comparator.comparing(Product::getDescription));
-        sortingFunctions.put("price", Comparator.comparing(Product::getPrice));
+    private List<Product> sortedProducts(SortParam param, SortOrder order) {
+        Comparator<Product> comparator = sortingFunctions.getOrDefault(param, Comparator.comparing(Product::getId));
 
-        Comparator<Product> comparator;
-        if (sortingFunctions.containsKey(param)) {
-            comparator = sortingFunctions.get(param);
-            if ("descend".equals(order)) {
-                comparator = sortingFunctions.get(param).reversed();
-            }
-        } else {
-            comparator = sortingFunctions.get("default");
+        if (SortOrder.DESCEND == order) {
+            comparator = comparator.reversed();
         }
 
-        if (productList == null) {
-            List<Product> result = products.stream().sorted(comparator)
-                    .collect(Collectors.toList());
+        List<Product> result = products.stream().sorted(comparator)
+                .collect(Collectors.toList());
 
-            return filterProductsByStockPrice(result);
-        } else {
-            productList.sort(comparator);
-            return filterProductsByStockPrice(productList);
-        }
+        return filterProductsByStockPrice(result);
     }
 
     @Override

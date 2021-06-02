@@ -17,7 +17,6 @@ public class CommandByUriFilter implements Filter {
     public CommandByUriFilter() {
     }
 
-    /**Constructor for tests*/
     public CommandByUriFilter(Map<String, Command> commands) {
         this.commands = commands;
     }
