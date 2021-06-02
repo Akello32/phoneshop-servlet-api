@@ -23,8 +23,7 @@ public class FindProductByQueryCommand implements Command {
         String query = request.getParameter("query");
 
         SearchParams params = new SearchParams(query);
-        request.setAttribute("products", productDao.findProducts(params
-        ));
+        request.setAttribute("products", productDao.findProducts(params));
 
         request.setAttribute("foundOnRequest", true);
         request.setAttribute("query", query);
