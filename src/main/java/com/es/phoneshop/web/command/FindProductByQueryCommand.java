@@ -2,7 +2,7 @@ package com.es.phoneshop.web.command;
 
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
-import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

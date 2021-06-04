@@ -1,6 +1,5 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.product.dao.ProductDao;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,12 +11,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Currency;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDetailsPageServletTest {
@@ -25,11 +23,8 @@ public class ProductDetailsPageServletTest {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
-    @Mock
-    private ProductDao productDao;
 
     ProductDetailsPageServlet servlet = new ProductDetailsPageServlet();
-    Currency usd = Currency.getInstance("USD");
 
     @Before
     public void setup() {

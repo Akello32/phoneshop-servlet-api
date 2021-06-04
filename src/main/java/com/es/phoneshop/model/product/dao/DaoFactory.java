@@ -1,7 +1,7 @@
 package com.es.phoneshop.model.product.dao;
 
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.dao.searchParam.SortParam;
+import com.es.phoneshop.model.product.dao.searchparam.SortParam;
 
 import java.util.Comparator;
 import java.util.EnumMap;

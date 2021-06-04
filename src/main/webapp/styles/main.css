@@ -53,3 +53,41 @@ img.product-tile {
     color: orangered;
     font-weight: bold;
 }
+
+.wrap {
+    display: flex;
+}
+
+.cart {
+    margin-left: 100px;
+}
+
+.error {
+    color: red;
+}
+
+.wrapRv {
+    margin-top: 50px;
+}
+
+.recentlyViewed {
+    display: flex;
+}
+
+.rvProduct {
+    align-self: center;
+    width: 15%;
+    border: 1px solid black;
+    margin-right: 10px;
+}
+
+.rvProduct p {
+    text-align: center;
+}
+
+.rvProduct img {
+    margin-top: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

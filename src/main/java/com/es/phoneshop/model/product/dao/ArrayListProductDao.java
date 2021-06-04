@@ -1,9 +1,9 @@
 package com.es.phoneshop.model.product.dao;
 
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
-import com.es.phoneshop.model.product.dao.searchParam.SortOrder;
-import com.es.phoneshop.model.product.dao.searchParam.SortParam;
+import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchparam.SortOrder;
+import com.es.phoneshop.model.product.dao.searchparam.SortParam;
 
 import java.util.ArrayList;
 import java.util.Arrays;

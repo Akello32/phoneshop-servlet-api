@@ -9,7 +9,7 @@
         Welcome to Expert-Soft training!
     </p>
     <c:url var="findQueryUrl" value="/productList/findQuery.jsp"></c:url>
-    <form method="post" action="${findQueryUrl}">
+    <form action="${findQueryUrl}">
         <input name="query" value="${param.query }"/>
         <button>Search</button>
     </form>

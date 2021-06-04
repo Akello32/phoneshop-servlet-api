@@ -1,9 +1,9 @@
-package com.es.phoneshop.model.product.dao.searchParam;
+package com.es.phoneshop.model.product.dao.searchparam;
 
 public class SearchParams {
     private SortOrder order;
     private SortParam param;
-    private String query;
+    private final String query;
 
     public SearchParams(SortOrder order, SortParam param, String query) {
         this.order = order;

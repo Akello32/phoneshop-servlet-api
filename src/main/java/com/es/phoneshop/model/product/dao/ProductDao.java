@@ -1,7 +1,7 @@
 package com.es.phoneshop.model.product.dao;
 
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
 
 import java.util.List;
 import java.util.Optional;

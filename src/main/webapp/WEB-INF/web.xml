@@ -17,7 +17,7 @@
 
   <filter>
     <filter-name>commandFilter</filter-name>
-    <filter-class>com.es.phoneshop.web.command.CommandByUriFilter</filter-class>
+    <filter-class>com.es.phoneshop.web.command.CommandPlpByUriFilter</filter-class>
   </filter>
   
   <listener>

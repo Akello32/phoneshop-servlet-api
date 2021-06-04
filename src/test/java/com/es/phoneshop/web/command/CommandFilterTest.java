@@ -24,7 +24,7 @@ public class CommandFilterTest {
     @Mock
     private FilterChain chain;
 
-    private final CommandByUriFilter commandByUriFilter = new CommandByUriFilter();
+    private final CommandPlpByUriFilter commandPlpByUriFilter = new CommandPlpByUriFilter();
 
     @Before
     public void setup() {
@@ -34,7 +34,7 @@ public class CommandFilterTest {
 
     @Test
     public void testDoFilter() throws IOException, ServletException {
-        commandByUriFilter.doFilter(request, response, chain);
+        commandPlpByUriFilter.doFilter(request, response, chain);
         verify(request).getRequestURI();
         verify(request).getContextPath();
     }

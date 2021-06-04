@@ -2,9 +2,9 @@ package com.es.phoneshop.model.product;
 
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
-import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
-import com.es.phoneshop.model.product.dao.searchParam.SortOrder;
-import com.es.phoneshop.model.product.dao.searchParam.SortParam;
+import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchparam.SortOrder;
+import com.es.phoneshop.model.product.dao.searchparam.SortParam;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;

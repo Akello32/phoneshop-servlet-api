@@ -3,9 +3,9 @@ package com.es.phoneshop.web.command;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
-import com.es.phoneshop.model.product.dao.searchParam.SearchParams;
-import com.es.phoneshop.model.product.dao.searchParam.SortOrder;
-import com.es.phoneshop.model.product.dao.searchParam.SortParam;
+import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchparam.SortOrder;
+import com.es.phoneshop.model.product.dao.searchparam.SortParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
