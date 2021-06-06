@@ -9,6 +9,4 @@ public interface CartService {
     Cart getCart(HttpServletRequest request);
 
     void add(Cart cart, Long productId, int quantity) throws OutOfStockException;
-
-    String outPutCart(Cart cart);
 }

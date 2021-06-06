@@ -1,7 +1,9 @@
 package com.es.phoneshop.model.cart;
 
+import com.es.phoneshop.model.cart.exception.OutOfStockException;
 import com.es.phoneshop.model.cart.service.DefaultCartService;
 import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.dao.ProductDao;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,14 +16,13 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
+import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultCartServiceTest {
@@ -32,12 +33,18 @@ public class DefaultCartServiceTest {
     private HttpSession session;
     @Mock
     private Cart cart;
+    @Mock
+    private ProductDao productDao;
 
     @Before
     public void setup() {
+        Currency usd = Currency.getInstance("USD");
         cartService = DefaultCartService.getInstance();
         when(request.getSession()).thenReturn(session);
         when(session.getAttribute(anyString())).thenReturn(new Cart());
+        when(productDao.getProduct(1L)).thenReturn(Optional.of(new Product(1l, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg")));
+        cartService.setProductDao(productDao);
+        when(cart.getItems()).thenReturn(new ArrayList<>());
     }
 
     @Test
@@ -48,21 +55,17 @@ public class DefaultCartServiceTest {
     }
 
     @Test
-    public void testOutputCart() {
-        Currency usd = Currency.getInstance("USD");
-        List<CartItem> cartItems = new ArrayList<>();
-        cartItems.add(new CartItem(new Product(1L, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg")
-                , 10));
-        cartItems.add(new CartItem(new Product(1L, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg")
-                , 10));
-        cartItems.add(new CartItem(new Product(2L, "iphone", "Apple iPhone", new BigDecimal(200), usd, 10, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg")
-                , 3));
-        cartItems.add(new CartItem(new Product(2L, "iphone", "Apple iPhone", new BigDecimal(200), usd, 10, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg")
-                , 3));
-        String expected = "sgs : 20;  iphone : 6;  ";
-        when(cart.getItems()).thenReturn(cartItems);
+    public void testAddToCart() throws OutOfStockException {
+        cartService.add(cartService.getCart(request), 1L, 5);
+        verify(productDao).getProduct(1L);
+        assertNotNull(cartService.getCart(request).getItems().get(0));
+    }
 
-        assertEquals(expected, cartService.outPutCart(cart));
-        verify(cart, atLeast(3)).getItems();
+    @Test
+    public void testUpdate() throws OutOfStockException {
+        Cart cart = cartService.getCart(request);
+        cartService.add(cart, 1L, 5);
+        cartService.add(cart, 1L, 10);
+        assertEquals(15, cart.getItems().get(0).getQuantity());
     }
 }

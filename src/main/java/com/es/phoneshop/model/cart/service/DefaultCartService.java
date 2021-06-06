@@ -15,13 +15,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DefaultCartService implements CartService {
     private static final String CART_SESSION_ATTRIBUTE = DefaultCartService.class.getName() + ".cart";
-    private final ProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
+    private ProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private DefaultCartService() {}
 
     private static class SingletonHolder {
         public static final DefaultCartService INSTANCE = new DefaultCartService();
+    }
+
+    public void setProductDao(ProductDao productDao) {
+        this.productDao = productDao;
     }
 
     public static DefaultCartService getInstance() {
@@ -43,30 +47,28 @@ public class DefaultCartService implements CartService {
     @Override
     public void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
         lock.writeLock().lock();
-        Optional<Product> productOpt = productDao.getProduct(productId);
-        Product product = productOpt.orElseThrow(() -> new ProductNotFoundException(productId));
-        int sumQuantity = quantityOfRequestedProduct(cart, product) + quantity;
-        if (product.getStock() < sumQuantity) {
-            throw new OutOfStockException(product, sumQuantity, product.getStock());
+        Optional<CartItem> cartItem = cart.getItems().stream()
+                .filter(i -> i.getProduct().getId().equals(productId))
+                .findAny();
+        if (cartItem.isPresent()) {
+            update(cart, cartItem.get(), quantity);
+        } else {
+            Product product = productDao.getProduct(productId).orElseThrow(() -> new ProductNotFoundException(productId));
+            cart.getItems().add(new CartItem(product, quantity));
         }
-        cart.getItems().add(new CartItem(product, quantity));
         lock.writeLock().unlock();
     }
 
-    @Override
-    public String outPutCart(Cart cart) {
-        StringBuilder result = new StringBuilder();
-        cart.getItems().stream()
-                .map(CartItem::getProduct).distinct()
-                .forEach(p -> result.append(p.getCode())
-                        .append(" : ")
-                        .append(quantityOfRequestedProduct(cart, p))
-                        .append(";  "));
-        return result.toString();
-    }
-
-    private int quantityOfRequestedProduct(Cart cart, Product product) {
-        return cart.getItems().stream().filter(p -> p.getProduct().equals(product))
-                .map(CartItem::getQuantity).mapToInt(p -> p).sum();
+    private void update(Cart cart, CartItem cartItem, int quantity) throws OutOfStockException {
+        int index = cart.getItems().indexOf(cartItem);
+        if (index == -1) {
+            throw new IllegalArgumentException();
+        }
+        quantity += cartItem.getQuantity();
+        if (cartItem.getProduct().getStock() < quantity) {
+            lock.writeLock().unlock();
+            throw new OutOfStockException(cartItem.getProduct(), quantity, cartItem.getProduct().getStock());
+        }
+        cart.getItems().set(index, new CartItem(cartItem.getProduct(), quantity));
     }
 }

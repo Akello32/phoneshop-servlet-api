@@ -7,9 +7,14 @@
 
 <tags:master pageTitle="product">
     <p>${product.description}</p>
-    <c:if test="${not empty param.message}">
-        <p style="color: darkgreen">${param.message}</p>
-    </c:if>
+    <c:choose>
+        <c:when test="${not empty error}">
+            <p style="color: red">Product not added to cart because ${error}</p>
+        </c:when>
+        <c:when test="${not empty param.added && param.added}">
+            <p style="color: darkgreen">Product added to cart</p>
+        </c:when>
+    </c:choose>
     <div class="wrap">
         <table>
             <thead>
