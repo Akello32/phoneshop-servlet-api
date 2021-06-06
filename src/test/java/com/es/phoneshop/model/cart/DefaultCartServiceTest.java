@@ -44,7 +44,6 @@ public class DefaultCartServiceTest {
         when(session.getAttribute(anyString())).thenReturn(new Cart());
         when(productDao.getProduct(1L)).thenReturn(Optional.of(new Product(1l, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg")));
         cartService.setProductDao(productDao);
-        when(cart.getItems()).thenReturn(new ArrayList<>());
     }
 
     @Test

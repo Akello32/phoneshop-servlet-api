@@ -64,11 +64,11 @@ public class DefaultCartService implements CartService {
         if (index == -1) {
             throw new IllegalArgumentException();
         }
-        quantity += cartItem.getQuantity();
-        if (cartItem.getProduct().getStock() < quantity) {
+        int sumQuantity = cartItem.getQuantity() + quantity;
+        if (cartItem.getProduct().getStock() < sumQuantity) {
             lock.writeLock().unlock();
-            throw new OutOfStockException(cartItem.getProduct(), quantity, cartItem.getProduct().getStock());
+            throw new OutOfStockException(cartItem.getProduct(), sumQuantity, cartItem.getProduct().getStock());
         }
-        cart.getItems().set(index, new CartItem(cartItem.getProduct(), quantity));
+        cart.getItems().set(index, new CartItem(cartItem.getProduct(), sumQuantity));
     }
 }

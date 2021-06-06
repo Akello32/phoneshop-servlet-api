@@ -7,6 +7,7 @@ import com.es.phoneshop.model.product.dao.searchparam.SortOrder;
 import com.es.phoneshop.model.product.dao.searchparam.SortParam;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -18,15 +19,15 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 
 public class ArrayListProductDaoTest {
-    private ProductDao productDao;
+    private static ProductDao productDao;
 
-    @Before
-    public void setup() {
+    @BeforeClass
+    public static void setup() {
         productDao = DaoFactory.getInstance().getProductDaoImpl();
     }
 
-    @Before
-    public void fillProductDao() {
+    @BeforeClass
+    public static void fillProductDao() {
         Currency usd = Currency.getInstance("USD");
         productDao.save(new Product("sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg"));
         productDao.save(new Product("iphone", "Apple iPhone", new BigDecimal(200), usd, 10, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg"));
