@@ -47,7 +47,9 @@
                     <div class="priceHistory">
                         <c:forEach var="priceHistory" items="${product.histories}">
                             <div class="noteInHistory">
-                                <a href="#"><fmt:formatDate value="${priceHistory.date}" /></a>
+                                <a href="#">
+                                    <fmt:parseDate value="${priceHistory.date}" pattern="yyyy-MM-dd" var="parsedDate"/>
+                                    <fmt:formatDate value="${parsedDate}"/></a>
                                 <a href="#"><fmt:formatNumber value="${priceHistory.price}" type="currency"
                                                               currencySymbol="${product.currency.symbol}"/></a>
                             </div>
