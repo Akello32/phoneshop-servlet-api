@@ -7,9 +7,7 @@ import com.es.phoneshop.model.product.dao.ProductDao;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DemoDataServletContextListener implements ServletContextListener {
