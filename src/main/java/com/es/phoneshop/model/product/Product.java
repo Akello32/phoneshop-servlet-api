@@ -2,7 +2,11 @@ package com.es.phoneshop.model.product;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Currency;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Objects;
 
 public class Product implements Serializable {
@@ -15,6 +19,7 @@ public class Product implements Serializable {
     private Currency currency;
     private int stock;
     private String imageUrl;
+    private List<PriceHistory> histories;
 
     public Product() {
     }
@@ -27,6 +32,8 @@ public class Product implements Serializable {
         this.currency = currency;
         this.stock = stock;
         this.imageUrl = imageUrl;
+        histories = new ArrayList<>();
+        histories.add(new PriceHistory(new GregorianCalendar(), price));
     }
 
     public Product(String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
@@ -63,6 +70,7 @@ public class Product implements Serializable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+        histories.add(new PriceHistory(new GregorianCalendar(), price));
     }
 
     public Currency getCurrency() {
@@ -87,6 +95,15 @@ public class Product implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public List<PriceHistory> getHistories() {
+        return histories;
+    }
+
+    public void setHistories(List<PriceHistory> histories) {
+        this.histories.addAll(histories);
+        this.histories.sort(Comparator.comparing(PriceHistory::getDate));
     }
 
     @Override

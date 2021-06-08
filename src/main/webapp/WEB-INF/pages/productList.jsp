@@ -20,10 +20,10 @@
         <tr>
             <td>Image</td>
             <td>Description
-                <tags:sortLink sortParam="desc" sortLink="${sortProductsUrl}" order="ascend"
-                               symbolOrder="&uArr;"></tags:sortLink>
-                <tags:sortLink sortParam="desc" sortLink="${sortProductsUrl}" order="descend"
-                               symbolOrder="&dArr;"></tags:sortLink>
+                    <tags:sortLink sortParam="desc" sortLink="${sortProductsUrl}" order="ascend"
+                                   symbolOrder="&uArr;"></tags:sortLink>
+                    <tags:sortLink sortParam="desc" sortLink="${sortProductsUrl}" order="descend"
+                                   symbolOrder="&dArr;"></tags:sortLink>
             <td class="price">Price
                 <tags:sortLink sortParam="price" sortLink="${sortProductsUrl}" order="ascend"
                                symbolOrder="&uArr;"></tags:sortLink>
@@ -42,8 +42,17 @@
                 </td>
                 <td>${product.description}</td>
                 <td class="price">
-                    <fmt:formatNumber value="${product.price}" type="currency"
-                                      currencySymbol="${product.currency.symbol}"/>
+                    <a class="priceButton"><fmt:formatNumber value="${product.price}" type="currency"
+                                                             currencySymbol="${product.currency.symbol}"/></a>
+                    <div class="priceHistory">
+                        <c:forEach var="priceHistory" items="${product.histories}">
+                            <div class="noteInHistory">
+                                <a href="#"><fmt:formatDate value="${priceHistory.date}" /></a>
+                                <a href="#"><fmt:formatNumber value="${priceHistory.price}" type="currency"
+                                                              currencySymbol="${product.currency.symbol}"/></a>
+                            </div>
+                        </c:forEach>
+                    </div>
                 </td>
             </tr>
         </c:forEach>
