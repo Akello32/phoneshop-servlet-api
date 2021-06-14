@@ -1,13 +1,11 @@
-package com.es.phoneshop.web;
+package com.es.phoneshop.web.servlet;
 
-import com.es.phoneshop.model.cart.Cart;
-import com.es.phoneshop.model.cart.exception.OutOfStockException;
-import com.es.phoneshop.model.cart.service.CartService;
-import com.es.phoneshop.model.cart.service.DefaultCartService;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
+import com.es.phoneshop.web.service.AddToCartService;
+import com.es.phoneshop.web.service.AddToCartServiceImpl;
 import com.es.phoneshop.web.service.RecentlyViewedService;
 import com.es.phoneshop.web.service.RecentlyViewedServiceImpl;
 
@@ -22,51 +20,50 @@ import java.util.Optional;
 
 
 public class ProductDetailsPageServlet extends HttpServlet {
-    private final ProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
-    private final CartService cartService = DefaultCartService.getInstance();
-    private final RecentlyViewedService recentlyViewedService = RecentlyViewedServiceImpl.getInstance();
+    private final ProductDao productDao;
+    private final RecentlyViewedService recentlyViewedService;
+    private final AddToCartService addToCartService;
+
+    public ProductDetailsPageServlet(ProductDao productDao, AddToCartService addToCartService, RecentlyViewedService recentlyViewedService) {
+        this.productDao = productDao;
+        this.addToCartService = addToCartService;
+        this.recentlyViewedService = recentlyViewedService;
+    }
+
+    public ProductDetailsPageServlet() {
+        this.productDao = DaoFactory.getInstance().getProductDaoImpl();
+        this.addToCartService = AddToCartServiceImpl.getInstance();
+        this.recentlyViewedService = RecentlyViewedServiceImpl.getInstance();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        process(req, resp, Optional.ofNullable(null));
+        process(req, resp, null);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Optional<Long> productId = Optional.of(parseProductId(req));
+        Long productId = Optional.of(parseProductId(req)).get();
         int quantity;
-
         try {
             quantity = parseQuantity(req);
-            if (quantity < 1) {
-                throw new NumberFormatException();
+            if (addToCartService.add(req, quantity, productId)) {
+                resp.sendRedirect(req.getContextPath() + "/products/" + productId + "?added=true");
+            } else {
+                process(req, resp, productId);
             }
-        } catch (NumberFormatException | ParseException e) {
+        } catch (ParseException e) {
             req.setAttribute("error", "Wrong number format is entered");
             process(req, resp, productId);
-            return;
         }
-
-        try {
-            Cart cart = cartService.getCart(req);
-            cartService.add(cart, productId.get(), quantity);
-        } catch (OutOfStockException e) {
-            req.setAttribute("error", "Out of stock. Available "
-                    + e.getStockAvailable() + ". Requested " + e.getStockRequested());
-            process(req, resp, productId);
-            return;
-        }
-
-        resp.sendRedirect(req.getContextPath() + "/products/" + productId.get() + "?added=true");
     }
 
-    private void process(HttpServletRequest req, HttpServletResponse resp, Optional<Long> productId) {
+    private void process(HttpServletRequest req, HttpServletResponse resp, Long id) {
         try {
-            Long finalProductId = productId.orElse(parseProductId(req));
-            Product product = productDao.getProduct(finalProductId)
-                    .orElseThrow(() -> new ProductNotFoundException(finalProductId));
+            Optional<Long> productId = Optional.ofNullable(id);
+            Product product = productDao.getProduct(productId.orElse(parseProductId(req)))
+                    .orElseThrow(() -> new ProductNotFoundException(productId.orElse(parseProductId(req))));
             req.setAttribute("product", product);
-            req.setAttribute("cart", cartService.getCart(req));
 
             recentlyViewedService.addToRecentlyViewed(req, product);
 

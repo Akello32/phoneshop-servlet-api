@@ -7,14 +7,7 @@
 
 <tags:master pageTitle="product">
     <p>${product.description}</p>
-    <c:choose>
-        <c:when test="${not empty error}">
-            <p style="color: red">Product not added to cart because ${error}</p>
-        </c:when>
-        <c:when test="${not empty param.added && param.added}">
-            <p style="color: darkgreen">Product added to cart</p>
-        </c:when>
-    </c:choose>
+    <tags:addedOrNot />
     <div class="wrap">
         <table>
             <thead>
@@ -43,7 +36,7 @@
                         ${product.stock}
                 </td>
                 <td>
-                    <form method="post">
+                    <form method="post" action="${pageContext.servletContext.contextPath}/products/${product.id}">
                         <input type="number" max="${product.stock}"
                                value="${not empty param.quantity ? param.quantity : 1}" min="1" name="quantity">
                         <button style="margin-top: 10px">Add to cart</button>
@@ -55,9 +48,7 @@
             </tr>
         </table>
 
-        <div class="cart">
-            <p>Cart: ${cart}</p>
-        </div>
+        <tags:miniCart/>
     </div>
     <c:if test="${fn:length(recentlyViewedProduct) >= 2}">
         <div class="wrapRv">
@@ -67,15 +58,15 @@
                            end="${fn:length(recentlyViewedProduct) - 1}">
                     <c:if test="${product.id != productRv.id}">
                         <c:url var="pdp" value="/products/${productRv.id}"></c:url>
-                            <div class="rvProduct">
-                                <a href="${pdp}">
+                        <div class="rvProduct">
+                            <a href="${pdp}">
                                 <img class="product-tile"
                                      src="${productRv.imageUrl}">
-                                </a>
-                                <p>${productRv.description}</p>
-                                <p><fmt:formatNumber value="${productRv.price}" type="currency"
-                                                     currencySymbol="${productRv.currency.symbol}"/></p>
-                            </div>
+                            </a>
+                            <p>${productRv.description}</p>
+                            <p><fmt:formatNumber value="${productRv.price}" type="currency"
+                                                 currencySymbol="${productRv.currency.symbol}"/></p>
+                        </div>
                     </c:if>
                 </c:forEach>
             </div>

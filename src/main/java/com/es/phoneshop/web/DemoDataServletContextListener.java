@@ -11,7 +11,15 @@ import java.util.Currency;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DemoDataServletContextListener implements ServletContextListener {
-    private ProductDao productDao = DaoFactory.getInstance().getProductDaoImpl();
+    private final ProductDao productDao;
+
+    public DemoDataServletContextListener() {
+        productDao = DaoFactory.getInstance().getProductDaoImpl();
+    }
+
+    public DemoDataServletContextListener(ProductDao productDao) {
+        this.productDao = productDao;
+    }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {

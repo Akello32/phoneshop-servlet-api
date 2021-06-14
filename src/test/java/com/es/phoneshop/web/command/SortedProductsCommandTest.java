@@ -35,19 +35,35 @@ public class SortedProductsCommandTest {
         when(productDao.findProducts(any())).thenReturn(new ArrayList<>());
         when(request.getParameter("order")).thenReturn("ascend");
         when(request.getParameter("sortParam")).thenReturn("desc");
-        when(request.getParameter("foundOnRequest")).thenReturn("true");
-        when(request.getParameter("query")).thenReturn("query");
+
         sortProduct = new SortProductsByParamCommand(daoFactory);
     }
 
     @Test
-    public void testExecute() {
+    public void testExecuteWithQuery() {
+        when(request.getParameter("foundOnRequest")).thenReturn("true");
+        when(request.getParameter("query")).thenReturn("query");
+
         sortProduct.execute(request, response);
+
         verify(daoFactory).getProductDaoImpl();
         verify(productDao).findProducts(any());
         verify(request).getParameter("order");
         verify(request).getParameter("sortParam");
         verify(request).getParameter("foundOnRequest");
         verify(request).getParameter("query");
+    }
+
+    @Test
+    public void testExecute() {
+        when(request.getParameter("foundOnRequest")).thenReturn("false");
+
+        sortProduct.execute(request, response);
+
+        verify(daoFactory).getProductDaoImpl();
+        verify(productDao).findProducts(any());
+        verify(request).getParameter("order");
+        verify(request).getParameter("sortParam");
+        verify(request).getParameter("foundOnRequest");
     }
 }

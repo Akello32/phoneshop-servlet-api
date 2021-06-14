@@ -14,49 +14,68 @@
         <button>Search</button>
     </form>
 
+    <tags:addedOrNot />
     <c:url var="sortProductsUrl" value="/productList/sortProducts.jsp"></c:url>
-    <table>
-        <thead>
-        <tr>
-            <td>Image</td>
-            <td>Description
+    <div class="wrap">
+        <table>
+            <thead>
+            <tr>
+                <td>Image</td>
+                <td>Description
                     <tags:sortLink sortParam="desc" sortLink="${sortProductsUrl}" order="ascend"
                                    symbolOrder="&uArr;"></tags:sortLink>
                     <tags:sortLink sortParam="desc" sortLink="${sortProductsUrl}" order="descend"
-                                   symbolOrder="&dArr;"></tags:sortLink>
-            <td class="price">Price
-                <tags:sortLink sortParam="price" sortLink="${sortProductsUrl}" order="ascend"
-                               symbolOrder="&uArr;"></tags:sortLink>
-                <tags:sortLink sortParam="price" sortLink="${sortProductsUrl}" order="descend"
-                               symbolOrder="&dArr;"></tags:sortLink></td>
-        </tr>
-        </thead>
-        <c:forEach var="product" items="${products}">
-            <c:url var="pdp" value="/products/${product.id}"></c:url>
-            <tr>
-                <td>
-                    <a href="${pdp}?">
-                        <img class="product-tile"
-                             src="${product.imageUrl}">
-                    </a>
-                </td>
-                <td>${product.description}</td>
-                <td class="price">
-                    <a class="priceButton"><fmt:formatNumber value="${product.price}" type="currency"
-                                                             currencySymbol="${product.currency.symbol}"/></a>
-                    <div class="priceHistory">
-                        <c:forEach var="priceHistory" items="${product.histories}">
-                            <div class="noteInHistory">
-                                <p>
-                                    <fmt:parseDate value="${priceHistory.date}" pattern="yyyy-MM-dd" var="parsedDate"/>
-                                    <fmt:formatDate value="${parsedDate}"/></p>
-                                <p><fmt:formatNumber value="${priceHistory.price}" type="currency"
-                                                              currencySymbol="${product.currency.symbol}"/></p>
-                            </div>
-                        </c:forEach>
-                    </div>
-                </td>
+                                   symbolOrder="&dArr;"></tags:sortLink></td>
+                <td class="price">Quantity</td>
+                <td class="price">Price
+                    <tags:sortLink sortParam="price" sortLink="${sortProductsUrl}" order="ascend"
+                                   symbolOrder="&uArr;"></tags:sortLink>
+                    <tags:sortLink sortParam="price" sortLink="${sortProductsUrl}" order="descend"
+                                   symbolOrder="&dArr;"></tags:sortLink></td>
+                <td></td>
             </tr>
-        </c:forEach>
-    </table>
+            </thead>
+            <c:forEach var="product" items="${products}">
+                <c:url var="pdp" value="/products/${product.id}"></c:url>
+                <tr>
+                    <td>
+                        <a href="${pdp}?">
+                            <img class="product-tile"
+                                 src="${product.imageUrl}">
+                        </a>
+                    </td>
+                    <td>${product.description}</td>
+                    <td>
+                        <form id="addToCart${product.id}" method="post"><input type="number" max="${product.stock}"
+                                                                 style="text-align: right"
+                                                                 value="${not empty param.quantity ? param.quantity : 1}"
+                                                                 min="1"
+                                                                    name="quantity${product.id}">
+                            <input type="hidden" name="productId" value="${product.id}">
+                        </form>
+                    </td>
+                    <td class="price">
+                        <a class="priceButton"><fmt:formatNumber value="${product.price}" type="currency"
+                                                                 currencySymbol="${product.currency.symbol}"/></a>
+                        <div class="priceHistory">
+                            <c:forEach var="priceHistory" items="${product.histories}">
+                                <div class="noteInHistory">
+                                    <p>
+                                        <fmt:parseDate value="${priceHistory.date}" pattern="yyyy-MM-dd"
+                                                       var="parsedDate"/>
+                                        <fmt:formatDate value="${parsedDate}"/></p>
+                                    <p><fmt:formatNumber value="${priceHistory.price}" type="currency"
+                                                         currencySymbol="${product.currency.symbol}"/></p>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </td>
+                    <td>
+                        <button style="margin-top: 10px" form="addToCart${product.id}">Add to cart</button>
+                    </td>
+                </tr>
+            </c:forEach>
+        </table>
+        <tags:miniCart/>
+    </div>
 </tags:master>
