@@ -1,10 +1,10 @@
 package com.es.phoneshop.web.servlet;
 
 import com.es.phoneshop.model.cart.Cart;
+import com.es.phoneshop.model.cart.service.DefaultCartService;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.ProductDao;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
-import com.es.phoneshop.web.service.AddToCartService;
 import com.es.phoneshop.web.service.RecentlyViewedService;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,6 @@ import java.util.Currency;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
@@ -41,13 +40,13 @@ public class ProductDetailsPageServletTest {
     private HttpSession session;
     @Mock
     private ProductDao productDao;
-    @Mock
-    private AddToCartService addToCartService;
+
     @Mock
     private RecentlyViewedService recentlyViewedService;
 
-
     private ProductDetailsPageServlet servlet;
+
+    private DefaultCartService cartService = DefaultCartService.getInstance();
 
     private Currency usd = Currency.getInstance("USD");
 
@@ -63,7 +62,9 @@ public class ProductDetailsPageServletTest {
         when(request.getLocale()).thenReturn(new Locale("ru"));
         when(productDao.getProduct(1l)).thenReturn(Optional.of(product));
 
-        servlet = new ProductDetailsPageServlet(productDao, addToCartService, recentlyViewedService);
+        cartService.setProductDao(productDao);
+
+        servlet = new ProductDetailsPageServlet(productDao, recentlyViewedService, cartService);
     }
 
     @Test
@@ -76,7 +77,7 @@ public class ProductDetailsPageServletTest {
         verify(request).getRequestDispatcher(anyString());
     }
 
-    @Test (expected = ProductNotFoundException.class)
+    @Test(expected = ProductNotFoundException.class)
     public void testDoGetWithIllegalId() throws ServletException, IOException {
         when(request.getPathInfo()).thenReturn("/b");
 
@@ -85,26 +86,18 @@ public class ProductDetailsPageServletTest {
 
     @Test
     public void testDoPost() throws ServletException, IOException {
-        try {
-            servlet.doPost(request, response);
-        } catch (ProductNotFoundException ex) {
-            assertEquals(ex.getProductCode(), Long.valueOf(request.getPathInfo().substring(1)));
-        }
-        verify(request, atLeast(2)).getPathInfo();
-        verify(request).getParameter(anyString());
-        verify(request).getLocale();
+        servlet.doPost(request, response);
+
+        verify(request).getPathInfo();
+        verify(response).sendRedirect(anyString());
     }
 
     @Test
     public void testDoPostWithWrongQuantity() throws ServletException, IOException {
-        when(request.getParameter(anyString())).thenReturn("0");
-        try {
-            servlet.doPost(request, response);
-        } catch (ProductNotFoundException ex) {
-            assertEquals(ex.getProductCode(), Long.valueOf(request.getPathInfo().substring(1)));
-        }
+        when(request.getParameter("quantity")).thenReturn("10000");
+        servlet.doPost(request, response);
 
-        verify(request).setAttribute("error", "Wrong number format is entered");
+        verify(request).setAttribute("error", "Out of stock. Available " + 100 + ". Requested " + 10000);
         verify(request, atLeast(2)).getPathInfo();
         verify(request).getParameter(anyString());
         verify(request).getLocale();

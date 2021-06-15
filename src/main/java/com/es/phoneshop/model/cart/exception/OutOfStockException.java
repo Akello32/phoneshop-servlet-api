@@ -8,6 +8,7 @@ public class OutOfStockException extends Exception {
     private final int stockAvailable;
 
     public OutOfStockException(Product product, int stockRequested, int stockAvailable) {
+        super("Out of stock. Available " + stockAvailable + ". Requested " + stockRequested);
         this.product = product;
         this.stockRequested = stockRequested;
         this.stockAvailable = stockAvailable;

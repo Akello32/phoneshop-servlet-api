@@ -4,6 +4,7 @@ import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.exception.OutOfStockException;
 import com.es.phoneshop.model.cart.service.CartService;
 import com.es.phoneshop.model.cart.service.DefaultCartService;
+import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,40 +29,37 @@ public class CartPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (request.getParameter("delete") != null) {
-            doDelete(request, response);
-        } else {
-            process(request, response);
-        }
+        process(request, response);
+
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String[] quantities = req.getParameterValues("quantity");
-        String[] productIds = req.getParameterValues("productId");
-
-        Map<Long, String> errors = new HashMap<>();
-        for (int i = 0; i < productIds.length; i++) {
-            Long productId = Long.valueOf(productIds[i]);
-            int quantity;
-
-            try {
-                quantity = parseQuantity(quantities[i], req);
-                if (quantity < 1) {
-                    throw new IllegalArgumentException();
-                }
-                Cart cart = cartService.getCart(req);
-                cartService.update(cart, productId, quantity);
-            } catch (IllegalArgumentException | ParseException | OutOfStockException e) {
-                handleError(errors, e, productId);
-            }
-        }
-
-        if (errors.isEmpty()) {
-            resp.sendRedirect(req.getContextPath() + "/cart?updated=true");
+        if (req.getParameter("delete") != null) {
+            doDelete(req, resp);
         } else {
-            req.setAttribute("errors", errors);
-            process(req, resp);
+            String[] quantities = req.getParameterValues("quantity");
+            String[] productIds = req.getParameterValues("productId");
+
+            Map<Long, String> errors = new HashMap<>();
+            for (int i = 0; i < productIds.length; i++) {
+                Long productId = Long.valueOf(productIds[i]);
+
+                try {
+                    int quantity = parseQuantity(quantities[i], req);
+                    Cart cart = cartService.getCart(req);
+                    cartService.update(cart, productId, quantity);
+                } catch (OutOfStockException | ProductNotFoundException | IllegalArgumentException e) {
+                    errors.put(productId, e.getMessage());
+                }
+            }
+
+            if (errors.isEmpty()) {
+                resp.sendRedirect(req.getContextPath() + "/cart?updated=true");
+            } else {
+                req.setAttribute("errors", errors);
+                process(req, resp);
+            }
         }
     }
 
@@ -83,21 +81,12 @@ public class CartPageServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/pages/cart.jsp").forward(request, response);
     }
 
-    private void handleError(Map<Long, String> errors, Exception ex, Long productId) {
-        Class<? extends Exception> exClass = ex.getClass();
-        if (exClass == ParseException.class) {
-            errors.put(productId, "Wrong number format is entered");
-        } else if (exClass == IllegalArgumentException.class) {
-            errors.put(productId, "Can't be less than one");
-        } else if (exClass == OutOfStockException.class) {
-            errors.put(productId, "Out of stock. Available "
-                    + ((OutOfStockException) ex).getStockAvailable()
-                    + ". Requested " + ((OutOfStockException) ex).getStockRequested());
+    private int parseQuantity(String quantity, HttpServletRequest req) {
+        try {
+            return NumberFormat.getNumberInstance(req.getLocale()).parse(quantity).intValue();
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Wrong number format is entered");
         }
-    }
-
-    private int parseQuantity(String quantity, HttpServletRequest req) throws ParseException {
-        return NumberFormat.getNumberInstance(req.getLocale()).parse(quantity).intValue();
     }
 }
 

@@ -14,7 +14,7 @@
         <button>Search</button>
     </form>
 
-    <tags:addedOrNot />
+    <tags:addedOrNot/>
     <c:url var="sortProductsUrl" value="/productList/sortProducts.jsp"></c:url>
     <div class="wrap">
         <table>
@@ -46,11 +46,9 @@
                     </td>
                     <td>${product.description}</td>
                     <td>
-                        <form id="addToCart${product.id}" method="post"><input type="number" max="${product.stock}"
-                                                                 style="text-align: right"
-                                                                 value="${not empty param.quantity ? param.quantity : 1}"
-                                                                 min="1"
-                                                                    name="quantity${product.id}">
+                        <form id="addToCart${product.id}" method="post">
+                            <input type="number" max="${product.stock}" style="text-align: right" value="1" min="1"
+                                   name="quantity">
                             <input type="hidden" name="productId" value="${product.id}">
                         </form>
                     </td>

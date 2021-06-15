@@ -2,11 +2,12 @@ package com.es.phoneshop.web.servlet;
 
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartItem;
+import com.es.phoneshop.model.cart.service.CartService;
+import com.es.phoneshop.model.cart.service.DefaultCartService;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
 import com.es.phoneshop.web.command.Command;
-import com.es.phoneshop.web.service.AddToCartService;
 import com.es.phoneshop.web.service.SaveSearchParamsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Locale;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
@@ -41,8 +43,6 @@ public class ProductListPageServletTest {
     @Mock
     private ProductDao productDao;
     @Mock
-    private AddToCartService addToCartService;
-    @Mock
     private SaveSearchParamsService saveSearchParamsService;
     @Mock
     private Command command;
@@ -51,28 +51,31 @@ public class ProductListPageServletTest {
     @Mock
     private DaoFactory daoFactory;
 
-    private Cart cart = new Cart();
-
     private ProductListPageServlet servlet;
+
+    private DefaultCartService cartService = DefaultCartService.getInstance();
+
+    Currency usd = Currency.getInstance("USD");
+
+    private Product product = new Product(1l, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "jpg");
 
     @Before
     public void setup() {
-        Currency usd = Currency.getInstance("USD");
-        cart.getItems().add(new CartItem(new Product(1l, "sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "jpg"), 10));
-
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
         when(request.getLocale()).thenReturn(new Locale("ru"));
-        when(request.getContextPath()).thenReturn(anyString());
         when(request.getSession()).thenReturn(session);
 
-        when(session.getAttribute("cart")).thenReturn(cart);
+//        when(session.getAttribute("cart")).thenReturn(new Cart());
 
         when(daoFactory.getProductDaoImpl()).thenReturn(productDao);
         when(productDao.findProducts()).thenReturn(new ArrayList<>());
+        when(productDao.getProduct(1l)).thenReturn(Optional.of(product));
 
         when(saveSearchParamsService.save(request)).thenReturn("str");
 
-        servlet = new ProductListPageServlet(daoFactory, addToCartService, saveSearchParamsService);
+        cartService.setProductDao(productDao);
+
+        servlet = new ProductListPageServlet(daoFactory, saveSearchParamsService, cartService);
     }
 
     @Test
@@ -101,43 +104,24 @@ public class ProductListPageServletTest {
     @Test
     public void doPost() throws ServletException, IOException {
         when(request.getParameter("productId")).thenReturn("1");
-        when(request.getParameter("quantity1")).thenReturn("10");
-        when(addToCartService.add(request, 10, 1L)).thenReturn(true);
+        when(request.getParameter("quantity")).thenReturn("10");
 
         servlet.doPost(request, response);
 
-        verify(request).getParameter("productId");
-        verify(request).getParameter("quantity1");
-        verify(addToCartService).add(request, 10, 1L);
+        verify(response).sendRedirect(anyString());
         verify(request).getContextPath();
         verify(saveSearchParamsService).save(request);
     }
 
     @Test
-    public void doPostNotAdd() throws ServletException, IOException {
-        when(request.getAttribute("command")).thenReturn(command);
-        when(request.getParameter("productId")).thenReturn("1");
-        when(request.getParameter("quantity1")).thenReturn("1000");
-
-        servlet.doPost(request, response);
-
-        verify(addToCartService).add(request, 1000, 1L);
-        verify(requestDispatcher).forward(request, response);
-        verify(request).getAttribute("command");
-        verify(command).execute(request, response);
-    }
-
-    @Test
     public void doPostIllegalQuantity() throws ServletException, IOException {
-        when(request.getAttribute("command")).thenReturn(command);
         when(request.getParameter("productId")).thenReturn("1");
-        when(request.getParameter("quantity1")).thenReturn("ggg");
+        when(request.getParameter("quantity")).thenReturn("ggg");
+        when(request.getAttribute("command")).thenReturn(command);
 
         servlet.doPost(request, response);
 
         verify(request).setAttribute("error", "Wrong number format is entered");
-        verify(request).getParameter("productId");
-        verify(request).getParameter("quantity1");
         verify(requestDispatcher).forward(request, response);
         verify(request).getAttribute("command");
         verify(command).execute(request, response);

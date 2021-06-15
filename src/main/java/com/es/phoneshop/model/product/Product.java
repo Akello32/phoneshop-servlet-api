@@ -2,7 +2,6 @@ package com.es.phoneshop.model.product;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
@@ -32,7 +31,6 @@ public class Product implements Serializable {
         this.stock = stock;
         this.imageUrl = imageUrl;
         histories = new ArrayList<>();
-        histories.add(new PriceHistory(LocalDate.now(), price));
     }
 
     public Product(String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
@@ -69,7 +67,6 @@ public class Product implements Serializable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
-        histories.add(new PriceHistory(LocalDate.now(), price));
     }
 
     public Currency getCurrency() {

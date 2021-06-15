@@ -75,7 +75,7 @@
                     <button>Update Cart</button>
                 </p>
             </form>
-            <form id="deleteCartItem">
+            <form id="deleteCartItem" method="post">
                 <input type="hidden" name="delete" value="delete">
             </form>
         </c:otherwise>

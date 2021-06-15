@@ -1,5 +1,6 @@
 package com.es.phoneshop.web;
 
+import com.es.phoneshop.model.product.PriceHistory;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
@@ -7,6 +8,7 @@ import com.es.phoneshop.model.product.dao.ProductDao;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Currency;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -50,6 +52,10 @@ public class DemoDataServletContextListener implements ServletContextListener {
         productDao.save(new Product("sgs3", "Samsung Galaxy S III", new BigDecimal(300), usd, 5, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20III.jpg"));
         productDao.save(new Product("simc61", "Siemens C61", new BigDecimal(80), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg"));
         productDao.save(new Product("simsxg75", "Siemens SXG75", new BigDecimal(150), usd, 40, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg"));
+
+        productDao.findProducts().forEach(p -> {
+            p.getHistories().add(new PriceHistory(LocalDate.now(), p.getPrice()));
+        });
     }
 
     private void setPriceInProduct() {
@@ -57,6 +63,7 @@ public class DemoDataServletContextListener implements ServletContextListener {
             int countPriceNote = ThreadLocalRandom.current().nextInt(0, 4);
             for (int i = 0; i < countPriceNote; i++) {
                 p.setPrice(BigDecimal.valueOf(ThreadLocalRandom.current().nextInt(100, 1500)));
+                p.getHistories().add(new PriceHistory(LocalDate.now(), p.getPrice()));
             }
         });
     }

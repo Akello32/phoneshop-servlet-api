@@ -9,6 +9,7 @@ public class Cart implements Serializable {
     private final List<CartItem> items;
 
     private int totalQuantity;
+
     private BigDecimal totalCost;
 
     public Cart() {

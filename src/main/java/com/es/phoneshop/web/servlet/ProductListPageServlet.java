@@ -1,11 +1,13 @@
 package com.es.phoneshop.web.servlet;
 
+import com.es.phoneshop.model.cart.Cart;
+import com.es.phoneshop.model.cart.exception.OutOfStockException;
+import com.es.phoneshop.model.cart.service.CartService;
+import com.es.phoneshop.model.cart.service.DefaultCartService;
 import com.es.phoneshop.model.product.dao.DaoFactory;
 import com.es.phoneshop.model.product.dao.ProductDao;
 import com.es.phoneshop.model.product.exception.ProductNotFoundException;
 import com.es.phoneshop.web.command.Command;
-import com.es.phoneshop.web.service.AddToCartService;
-import com.es.phoneshop.web.service.AddToCartServiceImpl;
 import com.es.phoneshop.web.service.SaveSearchParamsService;
 import com.es.phoneshop.web.service.SaveSearchParamsServiceImpl;
 
@@ -20,19 +22,19 @@ import java.util.Optional;
 
 public class ProductListPageServlet extends HttpServlet {
     private final ProductDao productDao;
-    private final AddToCartService addToCartService;
     private final SaveSearchParamsService searchParamsService;
+    private final CartService cartService;
 
-    public ProductListPageServlet(DaoFactory daoFactory, AddToCartService addToCartService, SaveSearchParamsService searchParamsService) {
+    public ProductListPageServlet(DaoFactory daoFactory, SaveSearchParamsService searchParamsService, CartService cartService) {
         this.productDao = daoFactory.getProductDaoImpl();
-        this.addToCartService = addToCartService;
         this.searchParamsService = searchParamsService;
+        this.cartService = cartService;
     }
 
     public ProductListPageServlet() {
         this.productDao = DaoFactory.getInstance().getProductDaoImpl();
-        this.addToCartService = AddToCartServiceImpl.getInstance();
         this.searchParamsService = SaveSearchParamsServiceImpl.getInstance();
+        this.cartService = DefaultCartService.getInstance();
     }
 
     @Override
@@ -42,18 +44,16 @@ public class ProductListPageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Long productId = Optional.of(parseProductId(req)).get();
-        int quantity;
         try {
-            quantity = parseQuantity(req, productId);
-            if (addToCartService.add(req, quantity, productId)) {
-                resp.sendRedirect(req.getContextPath() + "/productList/"
-                        + searchParamsService.save(req) + "&added=true");
-            } else {
-                process(req, resp);
-            }
-        } catch (ParseException e) {
-            req.setAttribute("error", "Wrong number format is entered");
+            Long productId = Optional.of(parseProductId(req)).get();
+            int quantity = parseQuantity(req);
+            String saveParams = searchParamsService.save(req);
+            Cart cart = cartService.getCart(req);
+            cartService.add(cart, productId, quantity);
+            resp.sendRedirect(req.getContextPath() + "/productList/"
+                     + (!saveParams.equals("") ? saveParams + "&added=true" : "?added=true"));
+        } catch (OutOfStockException | ProductNotFoundException | IllegalArgumentException e) {
+            req.setAttribute("error", e.getMessage());
             process(req, resp);
         }
     }
@@ -74,10 +74,14 @@ public class ProductListPageServlet extends HttpServlet {
         return Long.valueOf(req.getParameter("productId"));
     }
 
-    private int parseQuantity(HttpServletRequest req, Long productId) throws ParseException {
-        String quantityStr = Optional.ofNullable(req.getParameter("quantity" + productId))
-                .orElseThrow(() -> new ProductNotFoundException(productId));
-        return NumberFormat.getNumberInstance(req.getLocale()).parse(quantityStr).intValue();
+    private int parseQuantity(HttpServletRequest req) {
+        String quantityStr = req.getParameter("quantity");
+
+        try {
+            return NumberFormat.getNumberInstance(req.getLocale()).parse(quantityStr).intValue();
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Wrong number format is entered");
+        }
     }
 }
 

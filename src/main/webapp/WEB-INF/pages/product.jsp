@@ -38,7 +38,7 @@
                 <td>
                     <form method="post" action="${pageContext.servletContext.contextPath}/products/${product.id}">
                         <input type="number" max="${product.stock}"
-                               value="${not empty param.quantity ? param.quantity : 1}" min="1" name="quantity">
+                               value="1" min="1" name="quantity">
                         <button style="margin-top: 10px">Add to cart</button>
                         <c:if test="${not empty error}">
                             <p class="error">${error}</p>

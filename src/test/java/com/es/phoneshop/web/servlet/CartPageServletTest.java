@@ -49,8 +49,6 @@ public class CartPageServletTest {
 
     @Test
     public void testDoGet() throws ServletException, IOException {
-        when(request.getParameter("delete")).thenReturn(null);
-
         servlet.doGet(request, response);
 
         verify(requestDispatcher).forward(request, response);
@@ -58,21 +56,19 @@ public class CartPageServletTest {
 
     @Test
     public void testDoDelete() throws ServletException, IOException {
-        when(request.getParameter("delete")).thenReturn(anyString());
         when(request.getParameter("deletingProduct")).thenReturn("1");
 
-        servlet.doGet(request, response);
+        servlet.doDelete(request, response);
 
-        verify(cartService).delete(cartService.getCart(request), 1l);
+        verify(cartService).delete(cart, 1L);
         verify(response).sendRedirect(anyString());
     }
 
     @Test
     public void testDoDeleteWithIllegalId() throws ServletException, IOException {
-        when(request.getParameter("delete")).thenReturn(anyString());
         when(request.getParameter("deletingProduct")).thenReturn("b");
 
-        servlet.doGet(request, response);
+        servlet.doDelete(request, response);
 
         verify(request).setAttribute("deleteCartItemError", "Wrong product id format");
     }
@@ -87,16 +83,16 @@ public class CartPageServletTest {
         verify(request).getParameterValues("quantity");
         verify(request).getParameterValues("productId");
         verify(cartService, atLeast(3)).getCart(request);
-        verify(cartService).update(cart, 1l, 11);
+        verify(cartService).update(cart, 1L, 11);
         verify(response).sendRedirect(anyString());
     }
 
     @Test
-    public void testDoPostWithIllegalQuantity() throws ServletException, IOException, OutOfStockException {
-        when(request.getParameterValues("quantity")).thenReturn(new String[]{"0", "12", "13"});
+    public void testDoPostWithIllegalQuantity() throws ServletException, IOException {
+        when(request.getParameterValues("quantity")).thenReturn(new String[]{"bdfbdfb", "12", "13"});
         when(request.getParameterValues("productId")).thenReturn(new String[]{"1", "2", "3"});
         Map<Long, String> errors = new HashMap<>();
-        errors.put(1l, "Can't be less than one");
+        errors.put(1L, "Wrong number format is entered");
 
         servlet.doPost(request, response);
 

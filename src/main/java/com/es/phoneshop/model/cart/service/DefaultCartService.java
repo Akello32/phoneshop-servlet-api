@@ -46,22 +46,32 @@ public class DefaultCartService implements CartService {
         return cart;
     }
 
+    private void validateQuantity(int quantity, Product product) throws OutOfStockException {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("Can't be less than 1");
+        } else if (quantity > product.getStock()) {
+            throw new OutOfStockException(product, quantity, product.getStock());
+        }
+    }
+
     @Override
     public void update(Cart cart, Long productId, int quantity) throws OutOfStockException {
         lock.writeLock().lock();
         Optional<CartItem> cartItem = getCartItem(cart, productId);
 
         if (cartItem.isPresent() && cartItem.get().getQuantity() != quantity) {
-            if (quantity < cartItem.get().getProduct().getStock()) {
+            try {
+                validateQuantity(quantity, cartItem.get().getProduct());
                 CartItem updCartItem = new CartItem(cartItem.get().getProduct(), quantity);
                 cart.getItems().set(getIndex(cart, cartItem.get()), updCartItem);
-            } else {
+            } catch (IllegalArgumentException | OutOfStockException e) {
                 lock.writeLock().unlock();
-                throw new OutOfStockException(cartItem.get().getProduct(), cartItem.get().getProduct().getStock(), quantity);
+                throw e;
             }
         }
-        recalculateCart(cart);
-        calcTotalCost(cart);
+
+        recalculateProductInCart(cart);
+        calculateTotalCost(cart);
         lock.writeLock().unlock();
     }
 
@@ -69,8 +79,8 @@ public class DefaultCartService implements CartService {
     public void delete(Cart cart, Long productId) {
         lock.writeLock().lock();
         cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
-        recalculateCart(cart);
-        calcTotalCost(cart);
+        recalculateProductInCart(cart);
+        calculateTotalCost(cart);
         lock.writeLock().unlock();
     }
 
@@ -79,41 +89,44 @@ public class DefaultCartService implements CartService {
         lock.writeLock().lock();
         Optional<CartItem> cartItem = getCartItem(cart, productId);
         if (cartItem.isPresent()) {
-            addToExistingProduct(cart, cartItem.get(), quantity);
-        } else {
-            Product product = productDao.getProduct(productId).orElseThrow(() -> new ProductNotFoundException(productId));
-            if (product.getStock() < quantity) {
+            try {
+                validateQuantity(quantity, cartItem.get().getProduct());
+                update(cart, productId, cartItem.get().getQuantity() + quantity);
+            } catch (IllegalArgumentException | OutOfStockException e) {
                 lock.writeLock().unlock();
-                throw new OutOfStockException(product, quantity, product.getStock());
+                throw e;
             }
-            cart.getItems().add(new CartItem(product, quantity));
+        } else {
+            Product product = productDao.getProduct(productId).orElseThrow(() -> {
+                lock.writeLock().unlock();
+                return new ProductNotFoundException(productId);
+            });
+            try {
+                validateQuantity(quantity, product);
+                cart.getItems().add(new CartItem(product, quantity));
+            } catch (IllegalArgumentException | OutOfStockException e) {
+                lock.writeLock().unlock();
+                throw e;
+            }
         }
-        recalculateCart(cart);
-        calcTotalCost(cart);
+        recalculateProductInCart(cart);
+        calculateTotalCost(cart);
         lock.writeLock().unlock();
     }
 
-    private void addToExistingProduct(Cart cart, CartItem cartItem, int quantity) throws OutOfStockException {
-        int sumQuantity = cartItem.getQuantity() + quantity;
-        if (cartItem.getProduct().getStock() < sumQuantity) {
-            lock.writeLock().unlock();
-            throw new OutOfStockException(cartItem.getProduct(), sumQuantity, cartItem.getProduct().getStock());
-        }
-        cart.getItems().set(getIndex(cart, cartItem), new CartItem(cartItem.getProduct(), sumQuantity));
-    }
-
-    private void recalculateCart(Cart cart) {
+    private void recalculateProductInCart(Cart cart) {
         cart.setTotalQuantity(cart.getItems().stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum());
     }
 
-    private void calcTotalCost(Cart cart) {
-        int totalCost = 0;
-        for (CartItem i : cart.getItems()) {
-            totalCost += i.getQuantity() * i.getProduct().getPrice().intValue();
-        }
-        cart.setTotalCost(BigDecimal.valueOf(totalCost));
+    private void calculateTotalCost(Cart cart) {
+        BigDecimal totalCost = cart.getItems().stream()
+                .reduce(BigDecimal.ZERO, (q, p) -> BigDecimal.valueOf(p.getQuantity())
+                        .multiply(p.getProduct().getPrice())
+                        .add(q), BigDecimal::add);
+
+        cart.setTotalCost(totalCost);
     }
 
     private Optional<CartItem> getCartItem(Cart cart, Long productId) {
@@ -125,7 +138,7 @@ public class DefaultCartService implements CartService {
     private int getIndex(Cart cart, CartItem cartItem) {
         int index = cart.getItems().indexOf(cartItem);
         if (index == -1) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Wrong index format");
         }
         return index;
     }
