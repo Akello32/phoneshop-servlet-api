@@ -114,6 +114,13 @@ public class DefaultCartService implements CartService {
         lock.writeLock().unlock();
     }
 
+    @Override
+    public void clearCart(Cart cart) {
+        cart.getItems().clear();
+        cart.setTotalCost(BigDecimal.ZERO);
+        cart.setTotalQuantity(0);
+    }
+
     private void recalculateProductInCart(Cart cart) {
         cart.setTotalQuantity(cart.getItems().stream()
                 .mapToInt(CartItem::getQuantity)

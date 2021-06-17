@@ -67,7 +67,7 @@ public class ProductListPageServlet extends HttpServlet {
             request.setAttribute("products", productDao.findProducts());
             forwardPath.append("/WEB-INF/pages/productList.jsp");
         }
-        request.getRequestDispatcher(forwardPath.toString()).forward(request, response);
+            request.getRequestDispatcher(forwardPath.toString()).forward(request, response);
     }
 
     private Long parseProductId(HttpServletRequest req) {

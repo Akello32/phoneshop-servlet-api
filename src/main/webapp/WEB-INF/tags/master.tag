@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ tag trimDirectiveWhitespaces="true" %>
 <%@ attribute name="pageTitle" required="true" %>
 
@@ -13,6 +14,8 @@
       <img src="${pageContext.servletContext.contextPath}/images/logo.svg"/>
       PhoneShop
     </a>
+    <c:url var="cartLink" value="/cart/" />
+    <p style="font-size: 40px; margin: 0"><a href="${cartLink}">Cart</a>: quantity - ${cart.totalQuantity}; cost - ${cart.totalCost}</p>
   </header>
   <main>
     <jsp:doBody/>

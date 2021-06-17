@@ -47,8 +47,6 @@
                 </td>
             </tr>
         </table>
-
-        <tags:miniCart/>
     </div>
     <c:if test="${fn:length(recentlyViewedProduct) >= 2}">
         <div class="wrapRv">

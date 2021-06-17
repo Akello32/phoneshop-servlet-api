@@ -1,14 +1,14 @@
 package com.es.phoneshop.model.product;
 
+import com.es.phoneshop.model.general.Entity;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
-import java.util.Objects;
 
-public class Product implements Serializable {
-    private Long id;
+public class Product extends Entity implements Serializable {
     private String code;
     private String description;
     /** null means there is no price because the product is outdated or new */
@@ -17,13 +17,10 @@ public class Product implements Serializable {
     private Currency currency;
     private int stock;
     private String imageUrl;
-    private List<PriceHistory> histories;
-
-    public Product() {
-    }
+    private final List<PriceHistory> histories;
 
     public Product(Long id, String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
-        this.id = id;
+        super(id);
         this.code = code;
         this.description = description;
         this.price = price;
@@ -35,14 +32,6 @@ public class Product implements Serializable {
 
     public Product(String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
         this(null, code, description, price, currency, stock, imageUrl);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getCode() {
@@ -99,18 +88,5 @@ public class Product implements Serializable {
 
     public void setHistories(List<PriceHistory> histories) {
         this.histories.addAll(histories);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return Objects.equals(id, product.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 }

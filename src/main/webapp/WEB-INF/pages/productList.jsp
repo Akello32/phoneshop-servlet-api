@@ -74,6 +74,5 @@
                 </tr>
             </c:forEach>
         </table>
-        <tags:miniCart/>
     </div>
 </tags:master>

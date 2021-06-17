@@ -1,5 +1,6 @@
 package com.es.phoneshop.model.product.dao;
 
+import com.es.phoneshop.model.general.dao.Dao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
 import com.es.phoneshop.model.product.dao.searchparam.SortOrder;
@@ -17,9 +18,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-class ArrayListProductDao implements ProductDao {
-    private Long maxId = 0L;
-    private final List<Product> products = new ArrayList<>();
+class ArrayListProductDao extends Dao<Product> implements ProductDao {
+    private final List<Product> products = getItemList();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<SortParam, Comparator<Product>> sortingFunctions;
 
@@ -29,9 +29,7 @@ class ArrayListProductDao implements ProductDao {
 
     @Override
     public Optional<Product> getProduct(Long id) {
-        return products.stream()
-                .filter(p -> p.getId().equals(id))
-                .findAny();
+        return getItem(id);
     }
 
     @Override
@@ -107,26 +105,6 @@ class ArrayListProductDao implements ProductDao {
                 .collect(Collectors.toList());
 
         return filterProductsByStockPrice(result);
-    }
-
-    @Override
-    public void save(Product product) {
-        lock.writeLock().lock();
-        if (null == product.getId()) {
-            product.setId(maxId++);
-            products.add(product);
-        } else {
-            update(product);
-        }
-        lock.writeLock().unlock();
-    }
-
-    private void update(Product product) {
-        int index = products.indexOf(product);
-        if (index == -1) {
-            throw new IllegalArgumentException();
-        }
-        products.set(index, product);
     }
 
     @Override

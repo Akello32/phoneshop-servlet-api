@@ -53,9 +53,8 @@ public class DemoDataServletContextListener implements ServletContextListener {
         productDao.save(new Product("simc61", "Siemens C61", new BigDecimal(80), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg"));
         productDao.save(new Product("simsxg75", "Siemens SXG75", new BigDecimal(150), usd, 40, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg"));
 
-        productDao.findProducts().forEach(p -> {
-            p.getHistories().add(new PriceHistory(LocalDate.now(), p.getPrice()));
-        });
+        productDao.findProducts().forEach(p ->
+                p.getHistories().add(new PriceHistory(LocalDate.now(), p.getPrice())));
     }
 
     private void setPriceInProduct() {

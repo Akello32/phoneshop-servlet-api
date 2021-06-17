@@ -17,6 +17,7 @@
                 <p style="color: green">Product removed successfully</p>
             </c:if>
             <form method="post" action="${pageContext.servletContext.contextPath}/cart">
+                <h2>Your Cart</h2>
                 <table>
                     <thead>
                     <tr>
@@ -77,6 +78,9 @@
             </form>
             <form id="deleteCartItem" method="post">
                 <input type="hidden" name="delete" value="delete">
+            </form>
+            <form action="${pageContext.servletContext.contextPath}/checkout">
+                <button>Checkout</button>
             </form>
         </c:otherwise>
     </c:choose>
