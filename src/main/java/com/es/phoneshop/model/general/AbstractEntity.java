@@ -2,7 +2,7 @@ package com.es.phoneshop.model.general;
 
 import java.util.Objects;
 
-public abstract class Entity {
+public abstract class AbstractEntity {
     private Long id;
 
     public Long getId() {
@@ -13,10 +13,10 @@ public abstract class Entity {
         this.id = id;
     }
 
-    protected Entity() {
+    protected AbstractEntity() {
     }
 
-    protected Entity(Long id) {
+    protected AbstractEntity(Long id) {
         this.id = id;
     }
 
@@ -24,7 +24,7 @@ public abstract class Entity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Entity entity = (Entity) o;
+        AbstractEntity entity = (AbstractEntity) o;
         return Objects.equals(id, entity.id);
     }
 

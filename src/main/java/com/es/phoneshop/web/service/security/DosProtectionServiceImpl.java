@@ -1,13 +1,14 @@
 package com.es.phoneshop.web.service.security;
 
-import javax.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DosProtectionServiceImpl implements DosProtectionService {
     private static final long THRESHOLD = 20;
 
-    private Map<String, Long> countMap = new ConcurrentHashMap<>();
+    private static final long MINUTES = 60000;
+
+    private final Map<String, Map<Long, Long>> countMap = new ConcurrentHashMap<>();
 
     private DosProtectionServiceImpl() {
     }
@@ -21,28 +22,32 @@ public class DosProtectionServiceImpl implements DosProtectionService {
     }
 
     @Override
-    public boolean isAllowed(String ip, HttpSession session) {
-        Long start = (Long) session.getAttribute("start");
-        Long count = countMap.get(ip);
-        if (count == null) {
-            if (start == null) {
-                start = System.currentTimeMillis();
-                session.setAttribute("start", start);
-            }
+    public boolean isAllowed(String ip) {
+        Map<Long, Long> timeCountMap = countMap.get(ip);
+        Long count;
+        Long start;
+        if (timeCountMap == null) {
+            timeCountMap = new ConcurrentHashMap<>();
+            start = System.currentTimeMillis();
             count = 1L;
         } else {
-            if (System.currentTimeMillis() < start + 60*1000) {
+            start = timeCountMap.keySet().iterator().next();
+            count = timeCountMap.values().iterator().next();
+            if (System.currentTimeMillis() < start + MINUTES) {
                 if (count > THRESHOLD) {
                     return false;
                 }
                 count++;
             } else {
                 count = 1L;
-                session.setAttribute("start", System.currentTimeMillis());
+                start = System.currentTimeMillis();
             }
         }
 
-        countMap.put(ip, count);
+        timeCountMap.clear();
+        timeCountMap.put(start, count);
+        countMap.put(ip, timeCountMap);
+
         return true;
     }
 }

@@ -79,7 +79,7 @@ public class CheckoutPageServlet extends HttpServlet {
         }
         Order order = orderService.getOrder(cart);
         request.setAttribute("order", order);
-        request.setAttribute("paymentMethods", order.getPaymentMethods());
+        request.setAttribute("paymentMethods", PaymentMethod.values());
         request.getRequestDispatcher(JSP).forward(request, response);
     }
 

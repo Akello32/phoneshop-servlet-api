@@ -8,7 +8,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -29,15 +28,11 @@ public class DosFilterTest {
     @Mock
     private HttpServletResponse response;
     @Mock
-    private HttpSession session;
-    @Mock
     private FilterChain chain;
 
     @Before
     public void setup() {
-        when(request.getSession()).thenReturn(session);
         when(request.getRemoteAddr()).thenReturn("ip");
-        when(session.getAttribute(anyString())).thenReturn(System.currentTimeMillis());
     }
 
     @Test

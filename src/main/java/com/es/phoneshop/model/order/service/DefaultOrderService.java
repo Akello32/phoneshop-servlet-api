@@ -37,13 +37,9 @@ public class DefaultOrderService implements OrderService {
     public Order getOrder(Cart cart) {
         lock.writeLock().lock();
         Order order = new Order();
-        order.setItems(cart.getItems().stream().map(i -> {
-            try {
-                return (CartItem) i.clone();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList()));
+        order.setItems(cart.getItems().stream()
+                .map(CartItem::new)
+                .collect(Collectors.toList()));
         order.setSubtotal(cart.getTotalCost());
         order.setDeliveryCost(calculateDeliveryCost());
         order.setTotalCost(order.getSubtotal().add(order.getDeliveryCost()));

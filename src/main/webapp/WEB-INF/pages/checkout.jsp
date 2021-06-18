@@ -91,7 +91,7 @@
                             <td>
                                 <select name="paymentMethod" required>
                                     <option></option>
-                                    <c:forEach var="paymentMethod" items="${order.paymentMethods}">
+                                    <c:forEach var="paymentMethod" items="${paymentMethods}">
                                         <option>
                                             <p>${paymentMethod}</p>
                                         </option>

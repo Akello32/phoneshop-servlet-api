@@ -1,6 +1,6 @@
 package com.es.phoneshop.model.product.dao;
 
-import com.es.phoneshop.model.general.dao.Dao;
+import com.es.phoneshop.model.general.dao.AbstractDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
 import com.es.phoneshop.model.product.dao.searchparam.SortOrder;
@@ -14,13 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
-class ArrayListProductDao extends Dao<Product> implements ProductDao {
-    private final List<Product> products = getItemList();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
     private final Map<SortParam, Comparator<Product>> sortingFunctions;
 
     ArrayListProductDao(Map<SortParam, Comparator<Product>> sortingFunctions) {
@@ -34,7 +30,7 @@ class ArrayListProductDao extends Dao<Product> implements ProductDao {
 
     @Override
     public List<Product> findProducts() {
-        return filterProductsByStockPrice(products);
+        return filterProductsByStockPrice(getItemList());
     }
 
     @Override
@@ -43,7 +39,7 @@ class ArrayListProductDao extends Dao<Product> implements ProductDao {
         SortParam param = params.getParam();
         SortOrder order = params.getOrder();
         if (query == null && param == null) {
-            return filterProductsByStockPrice(products);
+            return filterProductsByStockPrice(getItemList());
         } else if (query != null && !query.trim().isEmpty() && param == null) {
             return filterProductsByQuery(query, null, null);
         } else if (param != null && query == null) {
@@ -59,7 +55,7 @@ class ArrayListProductDao extends Dao<Product> implements ProductDao {
         Map<Product, Long> countMatchesMap = new HashMap<>();
         List<Product> result;
 
-        products.forEach(p -> {
+        getItemList().forEach(p -> {
             int counter = (int) Arrays.stream(queries)
                     .filter(q -> p.getDescription().toLowerCase().contains(q.trim()))
                     .count();
@@ -101,16 +97,9 @@ class ArrayListProductDao extends Dao<Product> implements ProductDao {
             comparator = comparator.reversed();
         }
 
-        List<Product> result = products.stream().sorted(comparator)
+        List<Product> result = getItemList().stream().sorted(comparator)
                 .collect(Collectors.toList());
 
         return filterProductsByStockPrice(result);
-    }
-
-    @Override
-    public void delete(Long id) {
-        lock.writeLock().lock();
-        products.removeIf(p -> p.getId().equals(id));
-        lock.writeLock().unlock();
     }
 }

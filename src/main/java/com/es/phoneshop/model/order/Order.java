@@ -19,8 +19,6 @@ public class Order extends Cart {
 
     private PaymentMethod paymentMethod;
 
-
-
     public BigDecimal getSubtotal() {
         return subtotal;
     }
@@ -79,10 +77,6 @@ public class Order extends Cart {
 
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
-    }
-
-    public PaymentMethod[] getPaymentMethods() {
-        return PaymentMethod.values();
     }
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {

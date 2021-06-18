@@ -1,6 +1,6 @@
 package com.es.phoneshop.model.product;
 
-import com.es.phoneshop.model.general.Entity;
+import com.es.phoneshop.model.general.AbstractEntity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
-public class Product extends Entity implements Serializable {
+public class Product extends AbstractEntity implements Serializable {
     private String code;
     private String description;
     /** null means there is no price because the product is outdated or new */

@@ -1,13 +1,8 @@
 package com.es.phoneshop.model.order.dao;
 
 import com.es.phoneshop.model.order.Order;
-import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.dao.DaoFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.math.BigDecimal;
-import java.util.Currency;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -21,10 +16,13 @@ public class ArrayListOrderDaoTest {
 
     @BeforeClass
     public static void fillProductDao() {
-        Currency usd = Currency.getInstance("USD");
-        orderDao.save(new Order());
-        orderDao.save(new Order());
-        orderDao.save(new Order());
+        Order order = new Order();
+        order.setSecureId("secId1");
+        orderDao.save(order);
+        order.setSecureId("secId2");
+        orderDao.save(order);
+        order.setSecureId("secId2");
+        orderDao.save(order);
     }
 
     @Test
@@ -36,7 +34,6 @@ public class ArrayListOrderDaoTest {
     public void testGetOrderBySecureId() {
         Order order = new Order();
         order.setSecureId("secureId");
-        orderDao.getItemList().clear();
         orderDao.save(order);
         assertNotNull(orderDao.getOrderBySecureId("secureId"));
     }

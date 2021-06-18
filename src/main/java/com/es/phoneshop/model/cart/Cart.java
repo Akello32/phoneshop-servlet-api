@@ -1,13 +1,13 @@
 package com.es.phoneshop.model.cart;
 
-import com.es.phoneshop.model.general.Entity;
+import com.es.phoneshop.model.general.AbstractEntity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cart extends Entity implements Serializable {
+public class Cart extends AbstractEntity implements Serializable {
     private List<CartItem> items;
 
     private int totalQuantity;
