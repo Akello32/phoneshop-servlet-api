@@ -5,7 +5,10 @@ import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
 import com.es.phoneshop.model.product.dao.searchparam.SortOrder;
 import com.es.phoneshop.model.product.dao.searchparam.SortParam;
+import com.es.phoneshop.model.product.dao.searchparam.advancedsearch.AdvancedParam;
+import com.es.phoneshop.model.product.dao.searchparam.advancedsearch.DescParam;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,6 +54,11 @@ class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
 
     private List<Product> filterProductsByQuery(String query, SortParam param, SortOrder order) {
         Comparator<Product> comparator;
+
+        if (query == null) {
+            return getItemList();
+        }
+
         String[] queries = query.toLowerCase().trim().split("\\s+");
         Map<Product, Long> countMatchesMap = new HashMap<>();
         List<Product> result;
@@ -87,6 +95,55 @@ class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
         return productList.stream()
                 .filter(p -> p.getPrice() != null)
                 .filter(p -> p.getStock() > 0)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Product> advancedSearchProducts(AdvancedParam params) {
+        String desc = params.getDesc();
+        BigDecimal minPrice = params.getMinPrice();
+        BigDecimal maxPrice = params.getMaxPrice();
+        DescParam descParam = params.getDescParam();
+
+        List<Product> result = filterProductsByQuery(desc, null, null);
+
+        if (maxPrice != null && minPrice != null) {
+            return filterProductsByPrice(maxPrice, minPrice, result);
+        } else if (maxPrice == null && minPrice == null) {
+            return result;
+        } else if (maxPrice == null) {
+            return filterProductsByMinPrice(minPrice, result);
+        } else {
+            return filterProductsByMaxPrice(maxPrice, result);
+        }
+    }
+
+    private List<Product> filterProductsByPrice(BigDecimal maxPrice, BigDecimal minPrice, List<Product> products) {
+        return products.stream()
+                .filter(p -> {
+                    BigDecimal price = p.getPrice();
+                    int compareMax = price.compareTo(maxPrice);
+                    int compareMin = price.compareTo(minPrice);
+                    return compareMax == -1 || compareMax == 0 && compareMin == 1 || compareMin == 0;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<Product> filterProductsByMinPrice(BigDecimal minPrice, List<Product> products) {
+        return products.stream()
+                .filter(p -> {
+                    int compareMin = p.getPrice().compareTo(minPrice);
+                    return compareMin == 1 || compareMin == 0;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<Product> filterProductsByMaxPrice(BigDecimal maxPrice, List<Product> products) {
+        return products.stream()
+                .filter(p -> {
+                    int compareMax = p.getPrice().compareTo(maxPrice);
+                    return compareMax == -1 || compareMax == 0;
+                })
                 .collect(Collectors.toList());
     }
 

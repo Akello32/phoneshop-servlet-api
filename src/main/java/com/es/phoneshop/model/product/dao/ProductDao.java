@@ -2,6 +2,7 @@ package com.es.phoneshop.model.product.dao;
 
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.dao.searchparam.SearchParams;
+import com.es.phoneshop.model.product.dao.searchparam.advancedsearch.AdvancedParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,8 @@ public interface ProductDao {
     List<Product> findProducts();
 
     List<Product> findProducts(SearchParams params);
+
+    List<Product> advancedSearchProducts(AdvancedParam params);
 
     void save(Product product);
 

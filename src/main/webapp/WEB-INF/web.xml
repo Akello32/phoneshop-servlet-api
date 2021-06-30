@@ -64,6 +64,16 @@
     <url-pattern>/order/overview/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>advancedSearch</servlet-name>
+    <servlet-class>com.es.phoneshop.web.servlet.AdvancedSearchPageServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>advancedSearch</servlet-name>
+    <url-pattern>/advancedSearch</url-pattern>
+  </servlet-mapping>
+
   <filter>
     <filter-name>miniCartFilter</filter-name>
     <filter-class>com.es.phoneshop.web.filter.SetMiniCartFilter</filter-class>

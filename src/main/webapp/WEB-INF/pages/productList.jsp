@@ -8,14 +8,18 @@
     <p>
         Welcome to Expert-Soft training!
     </p>
-    <c:url var="findQueryUrl" value="/productList/findQuery.jsp"></c:url>
+    <c:url var="findQueryUrl" value="/productList/findQuery.jsp" />
     <form action="${findQueryUrl}">
         <input name="query" value="${param.query }"/>
         <button>Search</button>
     </form>
 
+    <c:url var="advancedSearch" value="/advancedSearch" />
+    <a href="${advancedSearch}">Advanced Search</a>
+    <br>
+
     <tags:addedOrNot/>
-    <c:url var="sortProductsUrl" value="/productList/sortProducts.jsp"></c:url>
+    <c:url var="sortProductsUrl" value="/productList/sortProducts.jsp" />
     <div class="wrap">
         <table>
             <thead>
