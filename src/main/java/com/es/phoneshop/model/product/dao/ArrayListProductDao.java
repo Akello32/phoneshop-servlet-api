@@ -137,9 +137,9 @@ class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
         return products.stream()
                 .filter(p -> {
                     BigDecimal price = p.getPrice();
-                    int compareMax = price.compareTo(maxPrice);
                     int compareMin = price.compareTo(minPrice);
-                    return compareMax == -1 || compareMax == 0 && compareMin == 1 || compareMin == 0;
+                    int compareMax = price.compareTo(maxPrice);
+                    return (compareMax == -1 || compareMax == 0) && (compareMin == 1 || compareMin == 0);
                 })
                 .collect(Collectors.toList());
     }
