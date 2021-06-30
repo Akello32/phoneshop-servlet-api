@@ -106,7 +106,7 @@ class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
         DescParam descParam = params.getDescParam();
 
         List<Product> result;
-        if(descParam == null || descParam.toString().equals("ANY_WORDS")) {
+        if (descParam == null || descParam.toString().equals("ANY_WORDS")) {
             result = filterProductsByQuery(desc, null, null);
         } else {
             result = filterProductsByDescByAllWord(desc);
@@ -129,7 +129,7 @@ class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
         }
 
         return getItemList().stream()
-                .filter(p -> p.getDescription().toLowerCase().contains(desc))
+                .filter(p -> p.getDescription().toLowerCase().contains(desc.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
