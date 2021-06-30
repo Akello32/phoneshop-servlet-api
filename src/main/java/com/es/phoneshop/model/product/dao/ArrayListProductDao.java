@@ -105,7 +105,12 @@ class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
         BigDecimal maxPrice = params.getMaxPrice();
         DescParam descParam = params.getDescParam();
 
-        List<Product> result = filterProductsByQuery(desc, null, null);
+        List<Product> result;
+        if(descParam == null || descParam.toString().equals("ANY_WORDS")) {
+            result = filterProductsByQuery(desc, null, null);
+        } else {
+            result = filterProductsByDescByAllWord(desc);
+        }
 
         if (maxPrice != null && minPrice != null) {
             return filterProductsByPrice(maxPrice, minPrice, result);
@@ -116,6 +121,16 @@ class ArrayListProductDao extends AbstractDao<Product> implements ProductDao {
         } else {
             return filterProductsByMaxPrice(maxPrice, result);
         }
+    }
+
+    private List<Product> filterProductsByDescByAllWord(String desc) {
+        if (desc == null) {
+            return getItemList();
+        }
+
+        return getItemList().stream()
+                .filter(p -> p.getDescription().toLowerCase().contains(desc))
+                .collect(Collectors.toList());
     }
 
     private List<Product> filterProductsByPrice(BigDecimal maxPrice, BigDecimal minPrice, List<Product> products) {
